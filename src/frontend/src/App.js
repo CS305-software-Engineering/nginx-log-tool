@@ -1,15 +1,28 @@
 import logo from './logo.svg';
-import './App.css';
 import LogIn from './main/Login/login';
 import SignUp from './main/Register/sign-up';
 import Dashboard from './main/Dashboard/home';
+import Grid from '@material-ui/core/Grid';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
+
 function App() {
   return (
-    <div className="App">
-      {/* <LogIn />
-      <SignUp /> */}
-      <Dashboard />
-    </div>
+
+  <BrowserRouter>
+        <Switch>
+          <Route path="/login">
+            <LogIn />
+          </Route>
+          <Route path="/register">
+            <SignUp />
+          </Route>
+          <Route path="/">
+            <Dashboard />
+          </Route>
+        </Switch>
+      </BrowserRouter>
+
   );
 }
 
