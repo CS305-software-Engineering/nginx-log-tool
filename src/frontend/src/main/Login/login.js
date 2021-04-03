@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
+import {useSelector , useDispatch} from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -36,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LogIn() {
   const classes = useStyles();
+
+
+  const user = useSelector(user => user.userData);
 
   return (
     <Container component="main" maxWidth="xs">
