@@ -8,7 +8,7 @@ import {
     genRefreshToken,
     sendRefreshToken,
 } from './tokens';
-import User from '../db/models/user.model';
+import User from '../models/user.model';
 
 const app = express.Router();
 
@@ -100,7 +100,7 @@ app.post('/signin', signinValidation, async (req: Request, res: Response) => {
  * @description     Logout request: removes cookie
  * @access          Public
  */
-app.post('/signout', verifyToken, async (req: Request, res: Response) => {
+app.post('/signout', verifyToken(), async (req: Request, res: Response) => {
     try {
         res.clearCookie('rid');
         res.send({ error: false, message: 'logged out!' });

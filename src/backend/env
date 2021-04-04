@@ -1,2 +1,0 @@
-REACT_APP_SERVER_PORT=8080
-DBURL=mongodb+srv://abhishek123:6xsgq33hPjcPpnQn@basecluster.zc8k4.mongodb.net/nginx-log-tool?retryWrites=true&w=majority

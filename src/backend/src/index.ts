@@ -5,6 +5,9 @@ import connectDB from './db/index';
 import auth from './auth/index';
 import refreshToken from './auth/refreshToken';
 import cookieParser from 'cookie-parser';
+import agent from './routes/agent/index';
+import staticMetrics from './routes/agent/staticMetrics';
+import dynMetrics from './routes/agent/dynMetrics';
 
 dotenv.config();
 const app = express();
@@ -12,7 +15,7 @@ const app = express();
 // middleware
 app.use(
     cors({
-        origin: `http://localhost:${process.env.REACT_APP_SERVER_PORT}`,
+        origin: `http://localhost:${process.env.CLIENT_APP_SERVER_PORT}`,
         credentials: true,
     })
 );
@@ -37,6 +40,11 @@ connectDB(process.env.DBURL as string);
 app.use('/auth', auth);
 // refresh_token route
 app.use('/refresh_token', refreshToken);
+
+// agent routes
+app.use('/agent/init', agent);
+app.use('/agent/static', staticMetrics);
+app.use('/agent/dyn', dynMetrics);
 
 app.get('/', (req: Request, res: Response) => {
     res.send({ error: false });

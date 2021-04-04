@@ -15,7 +15,7 @@ Backend module for the *Nginx Log Tool*.
 
 3. Run TypeScript server.
 
-    ```$ npm watch```
+    ```$ npm run watch```
 
 4. Start development server in another terminal.
    

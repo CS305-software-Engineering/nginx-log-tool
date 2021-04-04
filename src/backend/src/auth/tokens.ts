@@ -1,16 +1,20 @@
 import * as jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
-import { jwtpayload } from '../auth/index';
+import { jwtpayload } from './index';
+import { Interface } from 'readline';
 
-export function genAccessToken(payload: jwtpayload) {
+export function genAccessToken(payload: jwtpayload, expiry: string = '10m') {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET! as jwt.Secret, {
-        expiresIn: '10m',
+        expiresIn: expiry,
     });
 }
 
-export function genRefreshToken(payload: jwtpayload) {
+export function genRefreshToken(
+    payload: jwtpayload,
+    expiry: string = '30 days'
+) {
     return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET! as jwt.Secret, {
-        expiresIn: '30 days',
+        expiresIn: expiry,
     });
 }
 
@@ -21,19 +25,23 @@ export function sendRefreshToken(res: Response, refreshToken: any) {
     });
 }
 
-export function verifyToken(req: Request, res: Response, next: NextFunction) {
+export const verifyToken = (payloadType?: Interface) => (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     try {
         const auth = req.headers['authorization'] as String;
         if (!auth.split(' ')[1]) {
             throw new Error('please login first! (Not Authenticated)');
         }
-        const payload: jwtpayload = jwt.verify(
+        const payload: typeof payloadType = jwt.verify(
             auth.split(' ')[1],
             process.env.ACCESS_TOKEN_SECRET as jwt.Secret
-        ) as jwtpayload;
+        ) as typeof payloadType;
         res.locals.payload = payload;
         return next();
     } catch (err) {
         return res.send({ error: true, message: err.message });
     }
-}
+};
