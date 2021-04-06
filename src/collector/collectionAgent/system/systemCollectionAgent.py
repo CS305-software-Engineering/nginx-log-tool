@@ -2,6 +2,7 @@ import psutil
 import sys
 sys.path.append('LogTool/')
 from utility.threads import threaded
+
 class systemCollectionAgent():
     def __init__(self):
         self.data={}
@@ -13,6 +14,7 @@ class systemCollectionAgent():
     def cpuUsage(self):
         self.data['cpuPercent']=psutil.cpu_percent(1)
         print('a')
+
     @threaded
     def cpuCount(self):
         self.data['cpuCount']=psutil.cpu_count()
@@ -25,6 +27,5 @@ class systemCollectionAgent():
         for thread in handles:
             thread.join()
         print('threads completed')
-
 
 # print(a.cpuCount())
