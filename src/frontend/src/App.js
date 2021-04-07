@@ -1,27 +1,23 @@
-import logo from './logo.svg';
-import LogIn from './main/Login/login';
-import SignUp from './main/Register/sign-up';
-import Dashboard from './main/Dashboard/home';
-import Grid from '@material-ui/core/Grid';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-
+import MainPage from './main';
+import Login from './main/Login/login';
+import Register from './main/Register/sign-up';
 
 function App() {
   return (
-
   <BrowserRouter>
         <Switch>
           <Route path="/login">
-            <LogIn />
+            <Login />
           </Route>
           <Route path="/register">
-            <SignUp />
+            <Register />
           </Route>
           <Route path="/">
-            <Dashboard />
+          <MainPage />
           </Route>
         </Switch>
-      </BrowserRouter>
+  </BrowserRouter>
 
   );
 }
