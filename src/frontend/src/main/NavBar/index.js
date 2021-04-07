@@ -16,6 +16,9 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import { Button } from '@material-ui/core';
 
+import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
+
+
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
@@ -194,11 +197,20 @@ export default function PrimarySearchAppBar() {
           <div className={classes.grow} />
 
 
-          <Button color="inherit" >Overview</Button>
+          {/* <Button color="inherit" >Overview</Button> */}
+          <Link to="/" style={{color:"white" ,  marginLeft:20 }} >
+            Overview
+          </Link>
+          <Link to="/analytics" style={{color:"white" ,  marginLeft:20 }} >
+            Analytics
+          </Link>
+          <Link to="/alerts" style={{color:"white" ,  marginLeft:20 }} >
+            Alerts
+          </Link>
           
-          <Button color="inherit">Analytics</Button>
+          {/* <Button color="inherit">Analytics</Button> */}
 
-          <Button color= "secondary">Alerts</Button>
+          {/* <Button color= "secondary">Alerts</Button> */}
           <div className={classes.grow} />
 
           

@@ -6,6 +6,8 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
+import NavBar from '../NavBar';
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -64,7 +66,11 @@ export default function Analytics() {
   };
 
   return (
+    <div>
+      <NavBar />
+   
     <div className={classes.root}>
+
       <Tabs
         orientation="vertical"
         variant="scrollable"
@@ -88,6 +94,7 @@ export default function Analytics() {
         Item Three
       </TabPanel>
  
+    </div>
     </div>
   );
 }

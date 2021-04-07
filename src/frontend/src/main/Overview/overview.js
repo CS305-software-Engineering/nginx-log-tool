@@ -4,7 +4,8 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 
 import LineChart from '../Components/Charts/Line';
-import MultiLine from '../Components/Charts/MultiAxisLine';
+import NavBar from '../NavBar';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,6 +25,9 @@ function Overview() {
 
 
   return (
+    <div>
+    <NavBar />
+ 
     <Container>
       <h1 className='title' style={{textAlign:"center"}}>Overview Page</h1>
 
@@ -66,7 +70,7 @@ function Overview() {
         </Grid>
       </Grid>
     </Container>
-
+    </div>
   );
 }
 
