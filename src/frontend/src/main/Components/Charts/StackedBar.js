@@ -40,18 +40,11 @@ const options = {
   },
 }
 
-const StackedBar = () => (
+const StackedBar = (props) => (
   <>
     <div className='header'>
-      <h1 className='title'>Stacked Bar Chart</h1>
-      <div className='links'>
-        <a
-          className='btn btn-gh'
-          href='https://github.com/reactchartjs/react-chartjs-2/blob/react16/example/src/charts/StackedBar.js'
-        >
-          Github Source
-        </a>
-      </div>
+      <h1 className='title'>{props.title}</h1>
+      
     </div>
     <Bar data={data} options={options} />
   </>

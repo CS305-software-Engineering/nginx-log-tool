@@ -28,19 +28,11 @@ const data = {
   ],
 }
 
-const DoughnutChart = () => (
+const DoughnutChart = (props) => (
   <>
-    <div className='header'>
-      <h1 className='title'>Doughnut Chart</h1>
-      <div className='links'>
-        <a
-          className='btn btn-gh'
-          href='https://github.com/reactchartjs/react-chartjs-2/blob/react16/example/src/charts/Doughnut.js'
-        >
-          Github Source
-        </a>
+       <div className='header'>
+        <h1 className='title'>{props.title}</h1>
       </div>
-    </div>
     <Doughnut data={data} />
   </>
 )

@@ -41,18 +41,11 @@ const options = {
   },
 }
 
-const VerticalBar = () => (
+const VerticalBar = (props) => (
   <>
     <div className='header'>
-      <h1 className='title'>Vertical Bar Chart</h1>
-      <div className='links'>
-        <a
-          className='btn btn-gh'
-          href='https://github.com/reactchartjs/react-chartjs-2/blob/react16/example/src/charts/VerticalBar.js'
-        >
-          Github Source
-        </a>
-      </div>
+      <h1 className='title'>{props.title}</h1>
+    
     </div>
     <Bar data={data} options={options} />
   </>

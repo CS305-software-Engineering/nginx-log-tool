@@ -40,18 +40,11 @@ const options = {
   },
 }
 
-const HorizontalBarChart = () => (
+const HorizontalBarChart = (props) => (
   <>
     <div className='header'>
-      <h1 className='title'>Horizontal Bar Chart</h1>
-      <div className='links'>
-        <a
-          className='btn btn-gh'
-          href='https://github.com/reactchartjs/react-chartjs-2/blob/react16/example/src/charts/HorizontalBar.js'
-        >
-          Github Source
-        </a>
-      </div>
+      <h1 className='title'>{props.title}</h1>
+      
     </div>
     <HorizontalBar data={data} options={options} />
   </>

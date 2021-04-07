@@ -45,7 +45,7 @@ const options = {
 
 const data = genData()
 
-const ClickEvents = () => {
+const ClickEvents = (props) => {
   const [clickedDataset, setClickedDataset] = useState('')
   const [clickedElement, setClickedElement] = useState('')
   const [clickedElements, setClickedElements] = useState('')
@@ -75,15 +75,7 @@ const ClickEvents = () => {
   return (
     <>
       <div className='header'>
-        <h1 className='title'>Chart</h1>
-        <div className='links'>
-          <a
-            className='btn btn-gh'
-            href='https://github.com/reactchartjs/react-chartjs-2/blob/react16/example/src/charts/ClickEvents.js'
-          >
-            Github Source
-          </a>
-        </div>
+        <h1 className='title'>{props.title}</h1>
       </div>
       <Bar
         data={data}

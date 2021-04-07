@@ -42,7 +42,7 @@ const options = {
   },
 }
 
-const Dynamic = () => {
+const Dynamic = (props) => {
   const [data, setData] = useState(genData())
 
   useEffect(() => {
@@ -53,17 +53,9 @@ const Dynamic = () => {
 
   return (
     <>
-      <div className='header'>
-        <h1 className='title'>Dynamic Bar Chart</h1>
-        <div className='links'>
-          <a
-            className='btn btn-gh'
-            href='https://github.com/reactchartjs/react-chartjs-2/blob/react16/example/src/charts/Dynamic.js'
-          >
-            Github Source
-          </a>
-        </div>
-      </div>
+        <div className='header'>
+        <h1 className='title'>{props.title}</h1>
+      </div> 
       <Bar data={data} options={options} />
     </>
   )
