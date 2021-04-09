@@ -8,6 +8,9 @@ import cookieParser from 'cookie-parser';
 import agent from './routes/agent/index';
 import staticMetrics from './routes/agent/staticMetrics';
 import dynMetrics from './routes/agent/dynMetrics';
+import system from './routes/ui/system';
+import metrics from './routes/ui/metrics';
+import timeseries from './routes/ui/timeseries';
 
 dotenv.config();
 const app = express();
@@ -42,9 +45,13 @@ app.use('/auth', auth);
 app.use('/refresh_token', refreshToken);
 
 // agent routes
-app.use('/agent/init', agent);
+app.use('/agent', agent);
 app.use('/agent/static', staticMetrics);
 app.use('/agent/dyn', dynMetrics);
+// ui routes
+app.use('/system', system);
+app.use('/metrics', metrics);
+app.use('/timeseries', timeseries);
 
 app.get('/', (req: Request, res: Response) => {
     res.send({ error: false });

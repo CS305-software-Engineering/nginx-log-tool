@@ -1,6 +1,6 @@
 import cookieParser from 'cookie-parser';
 import express, { Request, Response } from 'express';
-import User, { IAgent } from '../../models/user.model';
+import User, { e_agentStatus, IAgent } from '../../models/user.model';
 import * as jwt from 'jsonwebtoken';
 
 const app = express.Router();
@@ -16,7 +16,7 @@ export interface agentTokenPayload {
  * @description     initiates an agent for the requested user
  * @access          Private (authorized by api key)
  */
-app.post('/', async (req: Request, res: Response) => {
+app.post('/init', async (req: Request, res: Response) => {
     try {
         const user = await User.findOne({
             api_key: req.body.api_key,
@@ -30,7 +30,7 @@ app.post('/', async (req: Request, res: Response) => {
         // create new agent if all the above checks are passed
         const agent: IAgent = {
             agentId: req.body.agentId,
-            agentStatus: true,
+            agentStatus: e_agentStatus.online,
         };
         // update in db
         user.agents?.push(agent);
@@ -51,5 +51,12 @@ app.post('/', async (req: Request, res: Response) => {
         res.send({ error: true, message: err.message });
     }
 });
+
+/**
+ * @route           POST /agent/init
+ * @description     initiates an agent for the requested user
+ * @access          Private (authorized by api key)
+ */
+// app.get()
 
 export default app;

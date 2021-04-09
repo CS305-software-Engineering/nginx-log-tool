@@ -4,18 +4,36 @@ import IMetrics, { INGINXStatisMetrics, IOSStaticMetrics } from './metrics';
 export interface IUser extends Document {
     email: String;
     password: String;
-    api_key?:String;
+    api_key?: String;
     status?: String;
     max_agents?: Number;
-    agents?: [IAgent];
+    agents?: Array<IAgent>;
 }
 
-export interface IAgent{
+export enum e_agentStatus {
+    offline = 'OFFLINE',
+    online = 'ONLINE',
+}
+
+export interface IAgentDesc {
+    host: String;
+    uid: String;
+}
+
+export interface IAgentSetting {
+    alias?: String;
+    tags?: [String];
+}
+
+export interface IAgent {
     agentId: String;
-    agentStatus: Boolean;
+    agentSetting?: IAgentSetting;
+    agentDesc?: IAgentDesc;
+    agentStatus?: e_agentStatus;
+    lastActive?: Date;
     metrics?: Array<IMetrics>;
-    osStaticMetrics?: IOSStaticMetrics;
-    nginxStaticMetrics?: INGINXStatisMetrics;
+    osStaticMetrics?: Array<IOSStaticMetrics>;
+    nginxStaticMetrics?: Array<INGINXStatisMetrics>;
 }
 
 export const userSchema: Schema = new Schema({
