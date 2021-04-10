@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
-import { INGINXStatisMetrics, IOSStaticMetrics } from 'src/models/metrics';
+import Agent from '../../models/agents.model';
+import { validationResult } from 'express-validator';
+import { INGINXStatisMetrics, IOSStaticMetrics } from '../../models/metrics';
 import User from '../../models/user.model';
 import verifyAgent, { staticMetricsValidation } from './common';
 
@@ -16,27 +18,30 @@ app.post(
     staticMetricsValidation,
     async (req: Request, res: Response) => {
         try {
-            console.log(res.locals.payload);
+            const validationError = validationResult(req);
+            if (!validationError.isEmpty) {
+                res.status(400).json({
+                    code: 400,
+                    errors: validationError.mapped(),
+                });
+            }
             const user = await User.findOne({
                 email: res.locals.payload.email,
-                'agents.agentId': res.locals.payload.agentId,
             });
             if (!user) {
                 throw new Error('User or Agent does not exist');
             }
-            const osMetrics: IOSStaticMetrics = req.body.osStatisMetrics;
+            const osMetrics: IOSStaticMetrics = req.body.osStaticMetrics;
             const nginxMetrics: INGINXStatisMetrics =
                 req.body.nginxStaticMetrics;
-            await User.updateOne(
+            await Agent.updateOne(
                 {
-                    email: res.locals.payload.email,
                     'agents.agentId': res.locals.payload.agentId,
                 },
                 {
                     $set: {
-                        'agents.$.agentStatus': req.body.agentStatus,
-                        'agents.$.osStaticMetrics': osMetrics,
-                        'agents.$.nginxStaticMetrics': nginxMetrics,
+                        osStaticMetrics: osMetrics,
+                        nginxStaticMetrics: nginxMetrics,
                     },
                 }
             );

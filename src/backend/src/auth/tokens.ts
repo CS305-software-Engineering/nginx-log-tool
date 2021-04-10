@@ -2,7 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import { jwtpayload } from './index';
 
-export function genAccessToken(payload: jwtpayload, expiry: string = '10m') {
+export function genAccessToken(payload: jwtpayload, expiry: string = '30m') {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET! as jwt.Secret, {
         expiresIn: expiry,
     });

@@ -9,6 +9,7 @@ import {
     sendRefreshToken,
 } from './tokens';
 import User from '../models/user.model';
+import mongoose from 'mongoose';
 
 const app = express.Router();
 
@@ -39,9 +40,12 @@ app.post('/signup', signupValidation, async (req: Request, res: Response) => {
         }
         const salt = await bcrypt.genSalt(6);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        const id = mongoose.Types.ObjectId();
         const user = new User({
+            _id: id,
             email: req.body.email,
             password: hashedPassword,
+            api_key: id,
         });
         await user.save();
         res.send({
@@ -82,7 +86,7 @@ app.post('/signin', signinValidation, async (req: Request, res: Response) => {
         }
         const payload: jwtpayload = {
             email: instance.email,
-        };
+        } as jwtpayload;
         // login successful
         // send access and refresh tokens
         sendRefreshToken(res, genRefreshToken(payload));
@@ -100,7 +104,7 @@ app.post('/signin', signinValidation, async (req: Request, res: Response) => {
  * @description     Logout request: removes cookie
  * @access          Public
  */
-app.post('/signout', verifyToken(), async (req: Request, res: Response) => {
+app.post('/signout', verifyToken, async (req: Request, res: Response) => {
     try {
         res.clearCookie('rid');
         res.send({ error: false, message: 'logged out!' });
