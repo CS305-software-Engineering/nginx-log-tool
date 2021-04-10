@@ -1,14 +1,16 @@
 import psutil
 import sys
-sys.path.append('LogTool/')
+sys.path.append('src/collector')
 from utility.threads import threaded
+
 import random
-class nginxCollectionAgent():
-    def _init_(self):
+class nginxCollectionAgent:
+
+    def __init__(self):
         self.data={}
         self.collectorFunctions=[ 
             ############### HTTP Methods
-            '''Statistics about observed request methods.'''
+            #'''Statistics about observed request methods.'''
             self.methodGet,
             self.methodHead,
             self.methodPost,
@@ -16,24 +18,24 @@ class nginxCollectionAgent():
             self.methodDelete,
             self.methodOptions,
             ############### HTTP Status Codes
-            '''Number of requests with HTTP status codes per class.'''
+            #'''Number of requests with HTTP status codes per class.'''
             self.status1xx,
             self.status2xx,
             self.status3xx,
             self.status4xx,
             self.status5xx,
-            '''Number of requests with specific HTTP status codes above.'''
+            #'''Number of requests with specific HTTP status codes above.'''
             self.status403,
             self.status404,
             self.status500,
             self.status502,
             self.status503,
             self.status504,
-            '''Number of requests finalized with status code 499 which is logged when the
-               client closes the connection.'''
+            #'''Number of requests finalized with status code 499 which is logged when the
+               #client closes the connection.'''
             self.statusDiscarded,
             ##################
-            '''Number of requests using a specific version of the HTTP protocol.'''
+            #'''Number of requests using a specific version of the HTTP protocol.'''
             self.httpV0_9,
             self.httpV1_0,
             self.httpV1_1,
@@ -51,8 +53,9 @@ class nginxCollectionAgent():
             self.writingRequests, # number of currently active writing requests to clients.  
             self.malformedRequets, #number of malformed requests till now. 
             self.bodyBitesSent # number of bytes sent to the client without counting the response headers. 
-            
         ]
+
+        
     @threaded
     def methodGet(self):
         self.data['methodGet']=random.randint(0,100)
@@ -200,15 +203,11 @@ class nginxCollectionAgent():
          self.data['malformedRequets']=random.randint(0, 100)
 
     #number of malformed requests till now. 
-
-    
     @threaded
     def bodyBitesSent(self):
          self.data['bodyBitesSent']=random.randint(0, 100)
 
     # number of bytes sent to the client without counting the response headers. 
-
-
 
     def setData(self):
         handles=[]
@@ -217,4 +216,9 @@ class nginxCollectionAgent():
         for thread in handles:
             thread.join()
         print('threads completed')
+        return self.data
+
+agent=nginxCollectionAgent()
+
+print(agent.setData())
 
