@@ -1,7 +1,6 @@
 import * as jwt from 'jsonwebtoken';
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { jwtpayload } from './index';
-import { Interface } from 'readline';
 
 export function genAccessToken(payload: jwtpayload, expiry: string = '10m') {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET! as jwt.Secret, {
@@ -25,20 +24,16 @@ export function sendRefreshToken(res: Response, refreshToken: any) {
     });
 }
 
-export const verifyToken = (payloadType?: Interface) => (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const verifyToken = (req: Request, res: Response, next: any) => {
     try {
         const auth = req.headers['authorization'] as String;
         if (!auth.split(' ')[1]) {
             throw new Error('please login first! (Not Authenticated)');
         }
-        const payload: typeof payloadType = jwt.verify(
+        const payload: jwtpayload = jwt.verify(
             auth.split(' ')[1],
             process.env.ACCESS_TOKEN_SECRET as jwt.Secret
-        ) as typeof payloadType;
+        ) as jwtpayload;
         res.locals.payload = payload;
         return next();
     } catch (err) {
