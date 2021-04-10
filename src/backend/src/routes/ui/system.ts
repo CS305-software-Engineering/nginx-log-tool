@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
-import { verifyToken } from 'src/auth/tokens';
+import { IAgent } from 'src/models/agents.model';
+import { verifyToken } from '../../auth/tokens';
 import User from '../../models/user.model';
 
 const app = express.Router();
@@ -11,20 +12,27 @@ const app = express.Router();
  */
 app.get('/objects', verifyToken, async (_req: Request, res: Response) => {
     try {
-        const user = await User.findOne({ email: res.locals.payload.email });
+        const user = await User.findOne({
+            email: res.locals.payload.email,
+        }).populate('agents');
         if (!user) {
             throw new Error('Invalid user');
         }
-        const resData = [];
-        user?.agents?.forEach((agent) => {
-            resData.push({
-                status: agent.agentStatus,
-                description: agent.agentDesc,
-                setting: agent.agentSetting,
-                lastActive: agent.lastActive,
-                static: agent.osStaticMetrics,
+        const resData: any = [];
+        if (user.agents instanceof String) {
+        } else {
+            user.agents?.forEach((agent: any) => {
+                resData.push({
+                    agentId: agent.agentId,
+                    status: agent.agentStatus,
+                    description: agent.agentDesc,
+                    setting: agent.agentSetting,
+                    lastActive: agent.lastActive,
+                    static: agent.osStaticMetrics,
+                });
             });
-        });
+        }
+        res.send({ resData });
     } catch (err) {
         res.send({ error: true, message: err.message });
     }

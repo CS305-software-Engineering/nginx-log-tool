@@ -24,7 +24,8 @@ export interface INGINXStatisMetrics {
 }
 
 
-export default interface IMetrics {
+export default interface ITSMetrics {
+    timestamp: Date;
     osMetrics: IOSMetrics;
     nginxMetrics: INGINXMetrics;
 }

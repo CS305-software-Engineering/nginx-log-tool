@@ -10,6 +10,7 @@ import staticMetrics from './routes/agent/staticMetrics';
 import dynMetrics from './routes/agent/dynMetrics';
 import system from './routes/ui/system';
 import metrics from './routes/ui/metrics';
+import timewindow from './routes/ui/timewindow';
 import timeseries from './routes/ui/timeseries';
 
 dotenv.config();
@@ -18,7 +19,7 @@ const app = express();
 // middleware
 app.use(
     cors({
-        origin: `http://localhost:${process.env.CLIENT_APP_SERVER_PORT}`,
+        origin: (process.env.CLIENT_URL as string) ?? '/',
         credentials: true,
     })
 );
@@ -51,12 +52,13 @@ app.use('/agent/dyn', dynMetrics);
 // ui routes
 app.use('/system', system);
 app.use('/metrics', metrics);
+app.use('/tw', timewindow);
 app.use('/timeseries', timeseries);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
     res.send({ error: false });
 });
 
-app.listen(process.env.SERVER_PORT ?? 3000, () => {
+app.listen(process.env.PORT ?? 3000, () => {
     console.log(`server is running at port:${process.env.SERVER_PORT ?? 3000}`);
 });
