@@ -38,6 +38,20 @@ class nginxCollectionAgent():
             self.httpV1_0,
             self.httpV1_1,
             self.httpV2,
+
+            ## these are connection metrics collectors. 
+            self.connectionsAccepted, #number of connections accepted till this time. 
+            self.connectionsDropped, #number of connections dropped till this time.    
+            self.activeConnections,# number of active connections right now
+            self.currentConnections, # number of connections right now
+            self.idleConnections,  # number of idle connections right now 
+            self.requestCount, # number of requests that have been sent till now.
+            self.currentRequests, # number of currently active requests that are  reading and writing. 
+            self.readingRequests, # number of currently active reading headers requests 
+            self.writingRequests, # number of currently active writing requests to clients.  
+            self.malformedRequets, #number of malformed requests till now. 
+            self.bodyBitesSent # number of bytes sent to the client without counting the response headers. 
+            
         ]
     @threaded
     def methodGet(self):
@@ -134,7 +148,7 @@ class nginxCollectionAgent():
 
     @threaded
     def connectionsDropped(self):
-        self.data['connectionsDropped']=psutil.cpu_count()
+        self.data['connectionsDropped']=random.randint(0,100)
         return
      #number of connections dropped till this time.     
 
@@ -187,15 +201,14 @@ class nginxCollectionAgent():
 
     #number of malformed requests till now. 
 
-    @threaded
-    def malformedRequets (self):
-         self.data['']=random.randint(0, 100)
-
+    
     @threaded
     def bodyBitesSent(self):
          self.data['bodyBitesSent']=random.randint(0, 100)
 
-    # number of bytes sent to the client without counting the response headers.   
+    # number of bytes sent to the client without counting the response headers. 
+
+
 
     def setData(self):
         handles=[]
