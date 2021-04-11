@@ -16,6 +16,7 @@ import timeseries from './routes/ui/timeseries';
 dotenv.config();
 const app = express();
 
+console.log((process.env.CLIENT_URL as string) ?? '/');
 // middleware
 app.use(
     cors({
@@ -40,20 +41,21 @@ app.use(
 // connect db
 connectDB(process.env.DBURL as string);
 
+// Web App routes
 // auth routes
-app.use('/auth', auth);
+app.use('/wapi/auth', auth);
 // refresh_token route
-app.use('/refresh_token', refreshToken);
+app.use('/wapi/refresh_token', refreshToken);
+// ui routes
+app.use('/wapi/system', system);
+app.use('/wapi/metrics', metrics);
+app.use('/wapi/tw', timewindow);
+app.use('/wapi/timeseries', timeseries);
 
 // agent routes
-app.use('/agent', agent);
-app.use('/agent/static', staticMetrics);
-app.use('/agent/dyn', dynMetrics);
-// ui routes
-app.use('/system', system);
-app.use('/metrics', metrics);
-app.use('/tw', timewindow);
-app.use('/timeseries', timeseries);
+app.use('/aapi/agent', agent);
+app.use('/aapi/agent/static', staticMetrics);
+app.use('/aapi/agent/dyn', dynMetrics);
 
 app.get('/', (_req: Request, res: Response) => {
     res.send({ error: false });
