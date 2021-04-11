@@ -1,6 +1,6 @@
 import psutil
 import sys
-sys.path.append('LogTool/')
+sys.path.append('src/collector')
 from utility.threads import threaded
 
 class systemCollectionAgent():
@@ -27,5 +27,6 @@ class systemCollectionAgent():
         for thread in handles:
             thread.join()
         print('threads completed')
+        return self.data
 
 # print(a.cpuCount())
