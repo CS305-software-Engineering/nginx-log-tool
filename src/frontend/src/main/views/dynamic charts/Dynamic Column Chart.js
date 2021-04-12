@@ -57,7 +57,7 @@ class DynamicColumnChart extends Component {
 		
 		return (
 		<div>
-			<h1>React Dynamic Line Chart</h1>
+			{/* <h1>React Dynamic Line Chart</h1> */}
 			<CanvasJSChart options = {options} 
 				onRef={ref => this.chart = ref}
 			/>

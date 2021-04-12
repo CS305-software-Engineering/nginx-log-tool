@@ -36,7 +36,7 @@ class StepLineChart extends Component {
 		
 		return (
 		<div>
-			<h1>React Step-Line Chart</h1>
+			{/* <h1>React Step-Line Chart</h1> */}
 			<CanvasJSChart options = {options} 
 				/* onRef={ref => this.chart = ref} */
 			/>

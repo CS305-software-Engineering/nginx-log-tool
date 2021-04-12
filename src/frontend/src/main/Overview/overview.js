@@ -7,14 +7,14 @@ import LineChart from '../Components/Charts/Line';
 import NavBar from '../NavBar';
 import { useSelector } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import DynamicColumnChart from '../../views/dynamic charts/Dynamic Column Chart';
-import DynamicLineChart from '../../views/dynamic charts/Dynamic Line Chart';
-import DynamicMultiSeriesChart from '../../views/dynamic charts/Dynamic Multi Series Chart';
+import DynamicColumnChart from '../views/dynamic charts/Dynamic Column Chart';
+import DynamicLineChart from '../views/dynamic charts/Dynamic Line Chart';
+import DynamicMultiSeriesChart from '../views/dynamic charts/Dynamic Multi Series Chart';
 
-import StepLineChart from '../../views/line charts/Step Line Chart';
-import LineChartCanvas from '../../views/line charts/Line Chart';
-import FunnelChartWithCustomization from '../../views/pie & funnel charts/Funnel Chart with Custom Neck';
-
+import StepLineChart from '../views/line charts/Step Line Chart';
+import LineChartCanvas from '../views/line charts/Line Chart';
+import FunnelChartWithCustomization from '../views/pie & funnel charts/Funnel Chart with Custom Neck';
+import DoughnutChart from '../views/pie & funnel charts/Doughnut Chart';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -80,7 +80,7 @@ function Overview() {
         <Grid item lg = {4} md={6}  xs={12}>
           <Paper className={classes.paper}>
           {/* <LineChart title="Request time"/> */}
-          <FunnelChartWithCustomization />
+          <DoughnutChart />
           </Paper>
         </Grid>
       </Grid>

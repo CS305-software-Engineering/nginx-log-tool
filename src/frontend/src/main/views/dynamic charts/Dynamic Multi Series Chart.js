@@ -92,7 +92,7 @@ class DynamicMultiSeriesChart extends Component {
 		
 		return (
 		<div>
-			<h1>React Dynamic Multi Series Chart</h1>
+			{/* <h1>React Dynamic Multi Series Chart</h1> */}
 			<CanvasJSChart options = {options} 
 				onRef={ref => this.chart = ref}
 			/>
