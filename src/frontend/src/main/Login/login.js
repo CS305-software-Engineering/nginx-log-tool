@@ -18,6 +18,13 @@ import { useHistory } from "react-router-dom";
 import {useDispatch , useSelector} from 'react-redux';
 import { saveUser } from '../../service/actions/user.actions';
 
+
+import IconButton from '@material-ui/core/IconButton';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import { Backdrop } from '@material-ui/core';
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -42,6 +49,8 @@ export default function LogIn() {
   const classes = useStyles();
   const [email , setEmail]  = useState("");
   const [password , setPassword]  = useState("");
+  const [showPassword , setShow] = useState(false);
+  // const [open , setOpen] = useState(false);
   const dispatch = useDispatch();
   const history = useHistory();
   const user = useSelector(state => state.userData)
@@ -54,10 +63,15 @@ export default function LogIn() {
     setPassword(e.target.value);
   }
 
-  
+  const handleClickShowPassword =() =>{
+    setShow(!showPassword);
+  }
+  const handleMouseDownPassword =(event) =>{
+    event.preventDefault();
+
+  }
 
   const handleLogin =()=>{
-
     const data = {
       'email':email,
       'password':password
@@ -69,6 +83,7 @@ export default function LogIn() {
     .then(res => {
       // console.log(res)
       dispatch(saveUser(res));
+    
 
       history.push('/');
     })
@@ -83,9 +98,13 @@ export default function LogIn() {
   }
 
   console.log("hello",user)
+  
+  
 
   return (
+    
     <Container component="main" maxWidth="xs">
+      
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
@@ -114,10 +133,23 @@ export default function LogIn() {
             fullWidth
             name="password"
             label="Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             id="password"
             autoComplete="current-password"
             onChange={handlePassword}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position='end'>
+                  <IconButton
+                      style = {{float:"right"}}
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           {/* <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -150,4 +182,5 @@ export default function LogIn() {
       </Box>
     </Container>
   );
+        
 }

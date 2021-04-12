@@ -14,8 +14,10 @@ import Container from '@material-ui/core/Container';
 
 import axios from 'axios';
 
-
-
+import IconButton from '@material-ui/core/IconButton';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import InputAdornment from '@material-ui/core/InputAdornment';
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -42,6 +44,8 @@ export default function SignUp() {
   const [email , setEmail] = useState("");
   const [password , setPassword]= useState("");
   const [c_password , setCPassword]  = useState("");
+  const [showPassword, setShow] = useState(false);
+  const [showPassword1, setShow1] = useState(false);
 
   const handleCPassword = (event) =>{
     setCPassword(event.target.value);
@@ -54,6 +58,18 @@ export default function SignUp() {
     setPassword(e.target.value);
   }
 
+  const handleClickShowPassword =() =>{
+    setShow(!showPassword);
+  }
+
+  const handleClickShowPassword1 =() =>{
+    setShow1(!showPassword1);
+  }
+  const handleMouseDownPassword =(event) =>{
+    event.preventDefault();
+
+  }
+  
   function handleRegister(){
     if(password == c_password){
     const data = {
@@ -135,17 +151,33 @@ export default function SignUp() {
               />
             </Grid>
             <Grid item xs={12}>
-              <TextField
+                <TextField
+                 style = {{float:"left"}}
                 variant="outlined"
                 required
                 fullWidth
                 name="password"
                 label="Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 id="password"
                 onChange = {handlePassword}
-                autoComplete="current-password"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton
+                          style = {{float:"right"}}
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
+
+               
+                
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -155,17 +187,30 @@ export default function SignUp() {
                 fullWidth
                 name="password1"
                 label="Confirm Password"
-                type="password"
+                type={showPassword1 ? 'text' : 'password'}
                 id="password-confirm"
-
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position='end'>
+                      <IconButton
+                          style = {{float:"right"}}
+                            onClick={handleClickShowPassword1}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {showPassword1 ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Grid>
-            {/* <Grid item xs={12}>
-              <FormControlLabel
+            <Grid item xs={12}>
+           
+              {/* <FormControlLabel
                 control={<Checkbox value="allowExtraEmails" color="primary" />}
                 label="I want to receive inspiration, marketing promotions and updates via email."
-              />
-            </Grid> */}
+              /> */}
+            </Grid>
           </Grid>
           <Button
             fullWidth
