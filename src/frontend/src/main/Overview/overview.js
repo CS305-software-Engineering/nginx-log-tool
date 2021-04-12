@@ -7,7 +7,13 @@ import LineChart from '../Components/Charts/Line';
 import NavBar from '../NavBar';
 import { useSelector } from 'react-redux';
 import { Redirect } from 'react-router-dom';
+import DynamicColumnChart from '../../views/dynamic charts/Dynamic Column Chart';
+import DynamicLineChart from '../../views/dynamic charts/Dynamic Line Chart';
+import DynamicMultiSeriesChart from '../../views/dynamic charts/Dynamic Multi Series Chart';
 
+import StepLineChart from '../../views/line charts/Step Line Chart';
+import LineChartCanvas from '../../views/line charts/Line Chart';
+import FunnelChartWithCustomization from '../../views/pie & funnel charts/Funnel Chart with Custom Neck';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -37,38 +43,44 @@ function Overview() {
       <Grid container spacing={1}  >
         <Grid item lg = {4} md={6}  xs={12}>
           <Paper className={classes.paper}>
-            <LineChart title ="No of Requests"/>
+            {/* <LineChart title ="No of Requests"/> */}
+            <LineChartCanvas />
           </Paper>
         </Grid>
         <Grid item lg = {4} md={6} xs={12}>
           <Paper className={classes.paper}>
-            <LineChart title="HTTP 5xx errors"/>
+            {/* <LineChart title="HTTP 5xx errors"/> */}
+            <StepLineChart />
+            
           </Paper>
         </Grid>
         <Grid item lg = {4} md={6}  xs={12}>
           <Paper className={classes.paper}>
-          <LineChart title="HTTP 4xx errors"/>
-
+          {/* <LineChart title="HTTP 4xx errors"/> */}
+         <DynamicLineChart />
           </Paper>
         </Grid>
       </Grid>
       <Grid container spacing={1}>
         <Grid item lg = {4} md={6}  xs={12}>
           <Paper className={classes.paper}>
-          <LineChart title="CPU usage"/>
+          {/* <LineChart title="CPU usage"/> */}
+          <DynamicColumnChart />
+
 
           </Paper>
         </Grid>
         <Grid item lg = {4} md={6}  xs={12}>
           <Paper className={classes.paper}>
-          <LineChart title="Traffic"/>
+          {/* <LineChart title="Traffic"/> */}
+          <DynamicMultiSeriesChart />
 
           </Paper>
         </Grid>
         <Grid item lg = {4} md={6}  xs={12}>
           <Paper className={classes.paper}>
-          <LineChart title="Request time"/>
-
+          {/* <LineChart title="Request time"/> */}
+          <FunnelChartWithCustomization />
           </Paper>
         </Grid>
       </Grid>
