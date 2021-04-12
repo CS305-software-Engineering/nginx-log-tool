@@ -6,6 +6,14 @@ from collectionAgent.nginx.nginxCollectionAgent import  nginxCollectionAgent
 from collectionAgent.system.systemCollectionAgent import systemCollectionAgent
 import persistqueue
 import requests
+from dotenv import load_dotenv
+import os
+from pathlib import Path
+from pathlib import Path
+import time
+load_dotenv(verbose=True)
+env_path =Path('../') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 class dataProcessor():
     def __init__(self):
@@ -16,8 +24,9 @@ class dataProcessor():
     
     def addData(self):
         data={
-            'osStaticMetrics':self.nginxCollector.setData(),
-            'nginxStaticMetrics':self.systemCollector.setData()
+            'timestamp':time.time(),
+            'nginxDynamicMetrics':self.nginxCollector.setData(),
+            'osDynamicMetrics':self.systemCollector.setData()
         }
         queue=persistqueue.FIFOSQLiteQueue('src/collector/dataProcessor/database', auto_commit=True)
         queue.put(data)
@@ -32,15 +41,19 @@ class dataProcessor():
             while(queue.size>0 and cnt<self.maxReqSize):
                 data.append(queue.get())
                 cnt+=1
-            
+        
+        
         #API call
-        data=requests.post('http://nginx-log-tool-api.herokuapp.com/agent/static',json=data, headers={
-            'Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3QxQG1haWwuY29tIiwiYWdlbnRJZCI6ImNvb2xfbWFjaGluZSIsImlhdCI6MTYxODA1MTg0NX0.AiuHhs8G4RD-hZLDxdH7xlCDDUbdnXKYNVSGZeZQEsI'
-        })
-        print(data.text)
+        try:
+            response=requests.post('http://nginx-log-tool.herokuapp.com/aapi/agent/static',json=data, headers={
+                'Authorization':'Bearer '+os.environ.get("TOKEN")
+            }) 
+            print(data[0])
+        except:
+            print('request failed')
+            for i in data:
+                queue.put(i)
         self.getDataFinished=True
-        data1=requests.get('http://127.0.0.1/nginx_status');
-        print(data1.text)
 
 
 
@@ -51,8 +64,7 @@ if __name__ == "__main__":
         processor.addData()
         if(processor.getDataFinished==True):
             processor.getData()  
-        print("witing")   
-        time.sleep(1)
+        time.sleep(10)
     
 
 
