@@ -16,6 +16,8 @@ class DynamicLineChart extends Component {
 		setInterval(this.updateChart, updateInterval);
 	}
 	updateChart() {
+		if (this.chart)
+		{
 		yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
 		dps.push({x: xVal,y: yVal});
 		xVal++;
@@ -23,6 +25,7 @@ class DynamicLineChart extends Component {
 			dps.shift();
 		}
 		this.chart.render();
+		}
 	}
 	render() {
 		const options = {

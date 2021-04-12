@@ -20,6 +20,8 @@ class DynamicMultiSeriesChart extends Component {
 	}
 	
 	updateChart(count) {
+		if (this.chart)
+		{
 		count = count || 1;		
 		for (var i = 0; i < count; i++) {
 			xValue += 2;
@@ -37,6 +39,7 @@ class DynamicMultiSeriesChart extends Component {
 		this.chart.options.data[0].legendText = " Bugatti Veyron - " + yValue1 + " km/h";
 		this.chart.options.data[1].legendText = " Lamborghini Aventador - " + yValue2 + " km/h";
 		this.chart.render();
+		}
 	}
 	render() {
 		const options = {

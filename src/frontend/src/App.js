@@ -33,11 +33,23 @@ function App() {
           </Route>
  
           <Route path="/analytics">
-            <Analytics />
+          {
+              !user.isAuthenticated ?   
+                <Login />
+              :
+              <Analytics />
+            }
+          
           </Route>
           
           <Route path="/alerts">
-          <Alerts />
+          {
+              !user.isAuthenticated ?   
+                <Login />
+              :
+              <Alerts />
+            }
+
           </Route>
           <Route path="/">
 
@@ -46,7 +58,6 @@ function App() {
                 <Login />
               :
               <Overview />
-              // <Template />
 
             }
 
