@@ -7,26 +7,23 @@ class systemCollectionAgent():
     def __init__(self):
         self.data={}
         self.collectorFunctions=[ 
-            self.cpuUsage,
-            self.cpuCount
+            self.cpuUsage
         ]
     @threaded
     def cpuUsage(self):
         self.data['cpuPercent']=psutil.cpu_percent(1)
-        print('a')
+        
 
     @threaded
     def cpuCount(self):
         self.data['cpuCount']=psutil.cpu_count()
-        print('b')
-    
+        
     def setData(self):
         handles=[]
         for i in self.collectorFunctions:
             handles.append(i())
         for thread in handles:
             thread.join()
-        print('threads completed')
+       
         return self.data
-
 # print(a.cpuCount())
