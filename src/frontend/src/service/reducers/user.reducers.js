@@ -1,26 +1,28 @@
-import {LOGIN_USER,REGISTER_USER} from '../constants';
+import {SAVE_USER, LOGOUT_USER , AUTH_CHECK} from '../constants';
 
-const initialState = {
-    userData:{}
-}
 
-export default function userReducer(state=initialState, action){
+
+export default function userReducer(state={}, action){
 
     switch(action.type) {
-        case LOGIN_USER:
+        case SAVE_USER:
             return {
                 ...state,
-                userData: action.data
+                userData: action.data,
+                isAuthenticated:true
             }
-        break;
 
-        case REGISTER_USER:
+        case LOGOUT_USER:
             return {
                 ...state,
-                userData: action.data
+                userData: {},
+                isAuthenticated: false
             }
-        break;
-
+        case AUTH_CHECK:
+            return {
+                ...state,
+                isAuthenticated:action.data
+            }
         default:
             return state
 

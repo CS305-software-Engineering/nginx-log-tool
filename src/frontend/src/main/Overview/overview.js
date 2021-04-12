@@ -5,6 +5,8 @@ import Grid from '@material-ui/core/Grid';
 
 import LineChart from '../Components/Charts/Line';
 import NavBar from '../NavBar';
+import { useSelector } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -21,9 +23,10 @@ const useStyles = makeStyles((theme) => ({
 
 function Overview() {
 
-    const classes = useStyles();
-
-
+  const classes = useStyles();
+  const user = useSelector(state => state.userData)
+  console.log(user)
+ 
   return (
     <div>
     <NavBar />

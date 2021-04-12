@@ -1,16 +1,35 @@
-import {LOGIN_USER , REGISTER_USER} from '../constants';
+import {SAVE_USER , LOGOUT_USER ,AUTH_CHECK} from '../constants';
 
-export const loginUser=(data)=>{
+import {axios} from 'axios';
+
+
+export const saveUser=(p)=>{
+
+    // console.log("action" , p.data);
+    localStorage.setItem('jwt_token', p.data.token)
+
+    return {
+        type:SAVE_USER,
+        data:p.data
+    }
     
-    // return {
-    //     type:LOGIN_USER,
-    //     data:data
-    // }
 }
 
-export const registerUser=(data)=>{
-    // return {
-    //     type:REGISTER_USER,
-    //     data:data
-    // }
+export const authCheck=()=>{
+    
+    const flag = localStorage.getItem('jwt_token')?true:false;
+
+    return {
+        type:AUTH_CHECK,
+        data:flag
+        
+    }
+}
+
+export const logOut = () =>{
+    localStorage.removeItem('jwt_token');
+
+    return {
+        type:LOGOUT_USER
+    }
 }
