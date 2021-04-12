@@ -1,14 +1,16 @@
 import psutil
 import sys
-sys.path.append('LogTool/')
+sys.path.append('src/collector')
 from utility.threads import threaded
+
 import random
-class nginxCollectionAgent():
-    def _init_(self):
+class nginxCollectionAgent:
+
+    def __init__(self):
         self.data={}
         self.collectorFunctions=[ 
             ############### HTTP Methods
-            '''Statistics about observed request methods.'''
+            #'''Statistics about observed request methods.'''
             self.methodGet,
             self.methodHead,
             self.methodPost,
@@ -16,29 +18,44 @@ class nginxCollectionAgent():
             self.methodDelete,
             self.methodOptions,
             ############### HTTP Status Codes
-            '''Number of requests with HTTP status codes per class.'''
+            #'''Number of requests with HTTP status codes per class.'''
             self.status1xx,
             self.status2xx,
             self.status3xx,
             self.status4xx,
             self.status5xx,
-            '''Number of requests with specific HTTP status codes above.'''
+            #'''Number of requests with specific HTTP status codes above.'''
             self.status403,
             self.status404,
             self.status500,
             self.status502,
             self.status503,
             self.status504,
-            '''Number of requests finalized with status code 499 which is logged when the
-               client closes the connection.'''
+            #'''Number of requests finalized with status code 499 which is logged when the
+               #client closes the connection.'''
             self.statusDiscarded,
             ##################
-            '''Number of requests using a specific version of the HTTP protocol.'''
+            #'''Number of requests using a specific version of the HTTP protocol.'''
             self.httpV0_9,
             self.httpV1_0,
             self.httpV1_1,
             self.httpV2,
+
+            ## these are connection metrics collectors. 
+            self.connectionsAccepted, #number of connections accepted till this time. 
+            self.connectionsDropped, #number of connections dropped till this time.    
+            self.activeConnections,# number of active connections right now
+            self.currentConnections, # number of connections right now
+            self.idleConnections,  # number of idle connections right now 
+            self.requestCount, # number of requests that have been sent till now.
+            self.currentRequests, # number of currently active requests that are  reading and writing. 
+            self.readingRequests, # number of currently active reading headers requests 
+            self.writingRequests, # number of currently active writing requests to clients.  
+            self.malformedRequets, #number of malformed requests till now. 
+            self.bodyBitesSent # number of bytes sent to the client without counting the response headers. 
         ]
+
+        
     @threaded
     def methodGet(self):
         self.data['methodGet']=random.randint(0,100)
@@ -134,7 +151,7 @@ class nginxCollectionAgent():
 
     @threaded
     def connectionsDropped(self):
-        self.data['connectionsDropped']=psutil.cpu_count()
+        self.data['connectionsDropped']=random.randint(0,100)
         return
      #number of connections dropped till this time.     
 
@@ -186,16 +203,11 @@ class nginxCollectionAgent():
          self.data['malformedRequets']=random.randint(0, 100)
 
     #number of malformed requests till now. 
-
-    @threaded
-    def malformedRequets (self):
-         self.data['']=random.randint(0, 100)
-
     @threaded
     def bodyBitesSent(self):
          self.data['bodyBitesSent']=random.randint(0, 100)
 
-    # number of bytes sent to the client without counting the response headers.   
+    # number of bytes sent to the client without counting the response headers. 
 
     def setData(self):
         handles=[]
@@ -204,4 +216,9 @@ class nginxCollectionAgent():
         for thread in handles:
             thread.join()
         print('threads completed')
+        return self.data
+
+agent=nginxCollectionAgent()
+
+print(agent.setData())
 

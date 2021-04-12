@@ -1,39 +1,22 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import IMetrics, { INGINXStatisMetrics, IOSStaticMetrics } from './metrics';
+import { IAgent } from './agents.model';
 
 export interface IUser extends Document {
-    email: String;
-    password: String;
+    email?: String;
+    timewindow?: String;
+    password?: String;
     api_key?: String;
     status?: String;
     max_agents?: Number;
-    agents?: Array<IAgent>;
+    agents?: Array<String> | Array<IAgent>;
 }
 
-export enum e_agentStatus {
-    offline = 'OFFLINE',
-    online = 'ONLINE',
-}
-
-export interface IAgentDesc {
-    host: String;
-    uid: String;
-}
-
-export interface IAgentSetting {
-    alias?: String;
-    tags?: [String];
-}
-
-export interface IAgent {
-    agentId: String;
-    agentSetting?: IAgentSetting;
-    agentDesc?: IAgentDesc;
-    agentStatus?: e_agentStatus;
-    lastActive?: Date;
-    metrics?: Array<IMetrics>;
-    osStaticMetrics?: Array<IOSStaticMetrics>;
-    nginxStaticMetrics?: Array<INGINXStatisMetrics>;
+export enum e_timewindow {
+    h_1 = '1h',
+    h_4 = '4h',
+    d_1 = '1d',
+    d_2 = '2d',
+    w_1 = '1w',
 }
 
 export const userSchema: Schema = new Schema({
@@ -42,7 +25,8 @@ export const userSchema: Schema = new Schema({
     api_key: String,
     status: { type: String, default: 'pending' },
     max_agents: { type: Number, default: 5 },
-    agents: Array<IAgent>(),
+    timewindow: { type: String, enum: e_timewindow, default: e_timewindow.h_1 },
+    agents: [{ type: Schema.Types.ObjectId, ref: 'Agents' }],
 });
 
 export default mongoose.model<IUser>('Users', userSchema);

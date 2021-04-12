@@ -21,9 +21,9 @@ function verifyAgent(req: Request, res: Response, next: any) {
 }
 
 export const staticMetricsValidation = [
-    check('osStatisMetrics')
+    check('osStaticMetrics')
         .exists()
-        .withMessage('osStatisMetrics is empty!'),
+        .withMessage('osStaticMetrics is empty!'),
     check('nginxStaticMetrics')
         .exists()
         .withMessage('nginxStaticMetrics is empty!')

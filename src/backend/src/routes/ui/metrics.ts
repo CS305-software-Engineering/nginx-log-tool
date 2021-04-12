@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { IMetricsDesc } from '../../models/metrics';
 import { verifyToken } from '../../auth/tokens';
-import User from '../../models/user.model';
+import Agent from '../../models/agents.model';
 
 const app = express.Router();
 
@@ -12,25 +12,19 @@ const app = express.Router();
  */
 app.get('/:agentId', verifyToken, async (req: Request, res: Response) => {
     try {
-        const resData: IMetricsDesc[] = [];
-        const user = await User.findOne({
-            email: res.locals.payload.email,
-            'agents.agentId': req.params.agentId,
+        const agent = await Agent.findOne({
+            agentId: req.params.agentId,
         });
-        if (!user) {
+        if (!agent) {
             throw new Error('Invalid User or agent');
         }
-        const agent = user.agents?.find(
-            (agent) => agent.agentId === req.params.agentId
-        );
-        agent?.osStaticMetrics?.forEach((metric) => {
-            resData.push(metric.desc);
-        });
-        agent?.nginxStaticMetrics?.forEach((metric) => {
-            resData.push(metric.desc);
-        });
+        const resData = {
+            os: agent?.osStaticMetrics ?? null,
+            nginx: agent?.nginxStaticMetrics ?? null,
+        };
         res.send({ metrics: resData });
     } catch (err) {
+        console.log(err);
         res.send({ error: true, message: err.message });
     }
 });
