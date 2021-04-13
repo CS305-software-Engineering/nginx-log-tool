@@ -4,15 +4,10 @@ import hash from 'object-hash';
 import User from '../../models/user.model';
 import Agent, { e_agentStatus } from '../../models/agents.model';
 import * as jwt from 'jsonwebtoken';
-import verifyAgent from './common';
+import { agentTokenPayload, verifyToken } from '../../auth/tokens';
 
 const app = express.Router();
 app.use(cookieParser());
-
-export interface agentTokenPayload {
-    email: String;
-    agentId: String;
-}
 
 /**
  * @route           POST /agent/init
@@ -87,9 +82,9 @@ app.post('/init', async (req: Request, res: Response) => {
  * @description     Saves all the metrics description from the agent in the DB
  * @access          Private (authorized by api key)
  */
-app.post('/metrics', verifyAgent, async (req: Request, res: Response) => {
+app.post('/metrics', verifyToken, async (req: Request, res: Response) => {
     try {
-        res.send({error:false, message:'Yet to implement'})
+        res.send({ error: false, message: 'Yet to implement' });
     } catch (err) {
         res.send({ error: true, message: false });
     }

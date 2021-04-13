@@ -25,3 +25,12 @@ export const signinValidation = [
         .isLength({ min: 6 })
         .withMessage('Password length must be more than 5'),
 ];
+
+export const staticMetricsValidation = [
+    check('osStaticMetrics')
+        .exists()
+        .withMessage('osStaticMetrics is empty!'),
+    check('nginxStaticMetrics')
+        .exists()
+        .withMessage('nginxStaticMetrics is empty!')
+];

@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import User from '../models/user.model';
 import * as jwt from 'jsonwebtoken';
-import { jwtpayload } from './index';
+import { userTokenPayload } from './tokens';
 import { genRefreshToken, genAccessToken, sendRefreshToken } from './tokens';
 
 const app = express.Router();
@@ -17,19 +17,19 @@ app.post('/', async (req: Request, res: Response) => {
         if (!token) {
             throw new Error('Please login first!');
         }
-        const payload: jwtpayload = jwt.verify(
+        const payload: userTokenPayload = jwt.verify(
             token,
             process.env.REFRESH_TOKEN_SECRET as jwt.Secret
-        ) as jwtpayload;
+        ) as userTokenPayload;
         const user = await User.findOne({
             email: payload.email,
         });
         if (!user) {
             throw new Error('Please login first! (user not in db)');
         }
-        const pload: jwtpayload = {
+        const pload: userTokenPayload = {
             email: payload.email,
-        } as jwtpayload;
+        } as userTokenPayload;
 
         sendRefreshToken(res, genRefreshToken(pload));
         res.send({
