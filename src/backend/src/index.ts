@@ -16,7 +16,6 @@ import timeseries from './routes/ui/timeseries';
 dotenv.config();
 const app = express();
 
-console.log((process.env.CLIENT_URL as string) ?? '/');
 // middleware
 app.use(
     cors({
@@ -62,5 +61,5 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 app.listen(process.env.PORT ?? 3000, () => {
-    console.log(`server is running at port:${process.env.SERVER_PORT ?? 3000}`);
+    console.log(`server is running at port:${process.env.PORT ?? 3000}`);
 });

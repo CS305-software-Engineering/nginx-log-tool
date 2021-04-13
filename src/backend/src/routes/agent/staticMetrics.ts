@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
-import Agent from '../../models/agents.model';
+import Agents from '../../models/agents.model';
 import { validationResult } from 'express-validator';
-import { INGINXStatisMetrics, IOSStaticMetrics } from '../../models/metrics';
+import { INGINXStaticMetrics, IOSStaticMetrics } from '../../models/metrics';
 import User from '../../models/user.model';
-import verifyAgent, { staticMetricsValidation } from './common';
+import { e_actor, verifyToken } from '../../auth/tokens';
+import { staticMetricsValidation } from '../../validators/index';
 
 const app = express.Router();
 
@@ -14,7 +15,7 @@ const app = express.Router();
  */
 app.post(
     '/',
-    verifyAgent,
+    verifyToken(e_actor.agent),
     staticMetricsValidation,
     async (req: Request, res: Response) => {
         try {
@@ -32,11 +33,11 @@ app.post(
                 throw new Error('User or Agent does not exist');
             }
             const osMetrics: IOSStaticMetrics = req.body.osStaticMetrics;
-            const nginxMetrics: INGINXStatisMetrics =
+            const nginxMetrics: INGINXStaticMetrics =
                 req.body.nginxStaticMetrics;
-            await Agent.updateOne(
+            await Agents.updateOne(
                 {
-                    'agents.agentId': res.locals.payload.agentId,
+                    agentId: res.locals.payload.agentId,
                 },
                 {
                     $set: {
@@ -45,7 +46,6 @@ app.post(
                     },
                 }
             );
-
             res.send({
                 error: false,
                 message: 'Successfully updated static metrics!',
