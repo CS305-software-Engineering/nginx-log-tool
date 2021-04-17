@@ -29,7 +29,7 @@ import Avatar from '@material-ui/core/Avatar';
 
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { addInstance } from '../../service/actions/user.actions';
+import { addInstance ,saveTimeSeriesData } from '../../service/actions/user.actions';
 
 import AddInstanceDialog from './createInstanceDialog';
 
@@ -91,6 +91,7 @@ export default function Analytics() {
   const dispatch = useDispatch();
   
   const instanceArray = useSelector(state => state.instanceData)
+  const timeseriesData = useSelector(state => state.timeseriesData)
 
 
 
@@ -120,8 +121,8 @@ function handleVisualise(agentId){
 
     axiosInstance.post(`timeseries/seq` , data )
     .then(function (response) {
-      console.log(JSON.stringify(response.data));
-      
+      // console.log(response.data);
+      dispatch( saveTimeSeriesData(  response) );
     })
     .catch(function (error) {
       console.log(error);
@@ -168,16 +169,41 @@ function getInstanceObjects(){
 
   // }, [])
  
-console.log(instanceArray.instanceData);
+// console.log(instanceArray.instanceData);
+console.log(timeseriesData)
+
+function getX(l){
+
+  var list_ = []
+  l.map((value) => {
+
+    list_.push(value._id);
+  }
+  );
+ return list_;
+
+}
+
+function getY(l){
+
+  var list_ = []
+  l.map((value) => {
+
+    list_.push(value.value);
+  }
+  );
+  return list_;
+
+}
 
   return (
     <div>
       <NavBar />
    
       <div className={classes.root}>
-      <Grid container spacing={1}>
+      <Grid container >
       
-        <Grid item xs={3} spacing={1}>
+        <Grid item xs={3} >
         <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -232,20 +258,30 @@ console.log(instanceArray.instanceData);
      
 
         </Grid>
-        <Grid item  spacing={1}>
+        <Grid item  >
           <Divider orientation="vertical" ></Divider>
         </Grid>
 
-        <Grid item xs={8} spacing={1}>
+        <Grid item xs={8} >
 
-            <Container>
-            <Grid container spacing={1}  >
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                  <LineChart title ="No of Requests"/>
-                </Paper>
-              </Grid>
-              <Grid item lg = {4} md={6} xs={12}>
+            <Container >
+            <Grid container spacing = {1}>
+
+
+
+
+              { timeseriesData.data != undefined ? timeseriesData.data.result.map((value) => {
+                return (
+              <Grid item lg = {6} md={6}  xs={12}>
+
+                <Paper elevation={2}>
+                  <LineChart  data = {value} x = {getX(value.timeseries)} y = {getY(value.timeseries)}/>
+                 </Paper>
+              </Grid> 
+              );
+            })
+          : "Click on Any Instance to Visualise"}
+              {/* <Grid item lg = {4} md={6} xs={12}>
                 <Paper className={classes.paper}>
                   <LineChart title="HTTP 5xx errors"/>
                 </Paper>
@@ -256,8 +292,7 @@ console.log(instanceArray.instanceData);
 
                 </Paper>
               </Grid>
-            </Grid>
-            <Grid container spacing={1}>
+       
               <Grid item lg = {4} md={6}  xs={12}>
                 <Paper className={classes.paper}>
                 <LineChart title="CPU usage"/>
@@ -275,7 +310,27 @@ console.log(instanceArray.instanceData);
                 <LineChart title="Request time"/>
 
                 </Paper>
+                
               </Grid>
+              <Grid item lg = {4} md={6}  xs={12}>
+                <Paper className={classes.paper}>
+                <LineChart title="CPU usage"/>
+
+                </Paper>
+              </Grid>
+              <Grid item lg = {4} md={6}  xs={12}>
+                <Paper className={classes.paper}>
+                <LineChart title="Traffic"/>
+
+                </Paper>
+              </Grid>
+              <Grid item lg = {4} md={6}  xs={12}>
+                <Paper className={classes.paper}>
+                <LineChart title="Request time"/>
+
+                </Paper>
+                
+              </Grid> */}
             </Grid>
             </Container>
         </Grid>

@@ -1,4 +1,4 @@
-import {ADD_INSTANCE , REMOVE_INSTANCE} from '../constants';
+import {ADD_INSTANCE , REMOVE_INSTANCE ,SAVE_TIMESERIES_SEQ} from '../constants';
 
 
 

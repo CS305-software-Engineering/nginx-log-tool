@@ -28,11 +28,11 @@ const  axiosInstance = axios.create({
 
   // Response interceptor for API calls
   axiosInstance.interceptors.response.use((response) => {
-	  console.log('axios',response)
+	//   console.log('axios',response)
 	return response
   }, async function (error) {
 	const originalRequest = error.config;
-	console.log("axIOS" , error.response)
+	// console.log("axIOS" , error.response)
 	if (error.response.error) {
 		axiosInstance
 		.post('refresh_token')

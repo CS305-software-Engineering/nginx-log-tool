@@ -1,4 +1,4 @@
-import {SAVE_USER , LOGOUT_USER ,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE} from '../constants';
+import {SAVE_USER , LOGOUT_USER ,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE , SAVE_TIMESERIES_SEQ} from '../constants';
 
 import {axios} from 'axios';
 
@@ -46,3 +46,10 @@ export const addInstance = (p) =>{
     }
 }
 
+export const saveTimeSeriesData = ( p) =>{
+
+    return {
+        type:SAVE_TIMESERIES_SEQ,
+        data:p.data
+    }
+}
