@@ -24,6 +24,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { Backdrop } from '@material-ui/core';
+import axiosInstance from '../../axios';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -77,14 +78,14 @@ export default function LogIn() {
       'password':password
     };
 
-    axios.post(`https://nginx-log-tool.herokuapp.com/wapi/auth/signin`, data, {
+    axiosInstance.post(`auth/signin`, data, {
       withCredentials: true,
     })
     .then(res => {
       // console.log(res)
       dispatch(saveUser(res));
     
-
+      // window.location.href = '/'
       history.push('/');
     })
     .catch( error => {

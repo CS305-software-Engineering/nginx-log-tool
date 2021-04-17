@@ -1,17 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
+import {fade,  makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import SearchIcon from '@material-ui/icons/Search';
+import InputBase from '@material-ui/core/InputBase';
 
+import axiosInstance from '../../axios';
+import {useEffect} from 'react';
 import NavBar from '../NavBar';
-import {Divider , Button, Container ,Grid, Paper } from '@material-ui/core';
+import {Divider , Button, Container ,Grid, Paper, IconButton } from '@material-ui/core';
 
 import LineChart from '../Components/Charts/Line';
+import SyncIcon from '@material-ui/icons/Sync';
 
+import {useDispatch ,useSelector} from 'react-redux';
 
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
+import Avatar from '@material-ui/core/Avatar';
+
+import FolderIcon from '@material-ui/icons/Folder';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { addInstance } from '../../service/actions/user.actions';
+
+import AddInstanceDialog from './createInstanceDialog';
+
+// sample agent id 5505d27ea1c7f1509736b60f3d081923b12eedfc
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,11 +42,133 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     minHeight: 900,
   },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginRight: theme.spacing(2),
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(3),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
 
 }));
 
+
+
+
+
 export default function Analytics() {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  
+  const instanceArray = useSelector(state => state.instanceData)
+
+
+
+function handleVisualise(agentId){
+
+//  console.log(agentId)
+
+
+  const data = {
+    "metrics": [
+        {
+            "from": 1618071100000,
+            "to": 1618071300000,
+            "metric": "cpuCount",
+            "granularity": "1m",
+            "agentId": agentId
+        },
+         {
+            "from": 1618071100000,
+            "to": 1618071300000,
+            "metric": "currentConnections",
+            "granularity": "1m",
+            "agentId": agentId
+        }
+    ]
+};
+
+    axiosInstance.post(`timeseries/seq` , data )
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+      
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+
+}
+
+
+function getInstanceObjects(){
+
+
+  axiosInstance.get(`system/objects`)
+  .then(function (response) {
+    // console.log(JSON.stringify(response.data));
+    dispatch(addInstance(response));
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+
+  // setInterval(100000);
+}
+
+  useEffect( () => {
+    getInstanceObjects();
+  }, [])
+
+    
+  // useEffect( () => {
+
+  //   axiosInstance.post(`timeseries/seq` , data )
+  //   .then(function (response) {
+  //     console.log(JSON.stringify(response.data));
+
+      
+
+
+  //   })
+  //   .catch(function (error) {
+  //     console.log(error);
+  //   });
+
+
+  // }, [])
+ 
+console.log(instanceArray.instanceData);
 
   return (
     <div>
@@ -34,11 +178,57 @@ export default function Analytics() {
       <Grid container spacing={1}>
       
         <Grid item xs={3} spacing={1}>
-          <div>
-            <Button fullWidth color="secondary" variant = "outlined">
-              Add New Instance
-            </Button>
+        <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+            />
           </div>
+     
+            <Grid>
+              <Grid item>
+              <AddInstanceDialog  />
+               <IconButton onClick = {getInstanceObjects}>
+                <SyncIcon />
+
+                </IconButton>
+              </Grid>
+             
+
+            </Grid>
+
+   
+            <List >
+              
+              { instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
+                return (
+                <ListItem button id={value.agentId} onClick={() => handleVisualise(value.agentId)} >
+                  <ListItemAvatar>
+                    <Avatar>
+                      <FolderIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={`${value.description.host} ${value.description.uid} `}
+                  />
+                  <ListItemSecondaryAction>
+               
+                    {/* <IconButton edge="end" aria-label="delete">
+                      <DeleteIcon />
+                    </IconButton> */}
+                  </ListItemSecondaryAction>
+                </ListItem>
+      );
+    })
+  : null}
+            </List>
      
 
         </Grid>

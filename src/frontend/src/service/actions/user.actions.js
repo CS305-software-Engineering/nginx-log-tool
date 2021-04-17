@@ -1,4 +1,4 @@
-import {SAVE_USER , LOGOUT_USER ,AUTH_CHECK} from '../constants';
+import {SAVE_USER , LOGOUT_USER ,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE} from '../constants';
 
 import {axios} from 'axios';
 
@@ -6,7 +6,7 @@ import {axios} from 'axios';
 export const saveUser=(p)=>{
 
     // console.log("action" , p.data);
-    localStorage.setItem('jwt_token', p.data.token)
+    localStorage.setItem('access_token', p.data.token)
 
     return {
         type:SAVE_USER,
@@ -17,7 +17,10 @@ export const saveUser=(p)=>{
 
 export const authCheck=()=>{
     
-    const flag = localStorage.getItem('jwt_token')?true:false;
+    const accessToken = localStorage.getItem('access_token');
+    const flag = accessToken?true:false;
+ 
+
 
     return {
         type:AUTH_CHECK,
@@ -27,9 +30,19 @@ export const authCheck=()=>{
 }
 
 export const logOut = () =>{
-    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('access_token');
 
     return {
         type:LOGOUT_USER
     }
 }
+
+export const addInstance = (p) =>{
+
+    return {
+        type:ADD_INSTANCE,
+        data:p.data.resData
+
+    }
+}
+
