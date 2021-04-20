@@ -12,6 +12,7 @@ import system from './routes/ui/system';
 import metrics from './routes/ui/metrics';
 import timewindow from './routes/ui/timewindow';
 import timeseries from './routes/ui/timeseries';
+import user from './routes/ui/user';
 
 dotenv.config();
 const app = express();
@@ -50,6 +51,7 @@ app.use('/wapi/system', system);
 app.use('/wapi/metrics', metrics);
 app.use('/wapi/tw', timewindow);
 app.use('/wapi/timeseries', timeseries);
+app.use('/wapi/user', user);
 
 // agent routes
 app.use('/aapi/agent', agent);

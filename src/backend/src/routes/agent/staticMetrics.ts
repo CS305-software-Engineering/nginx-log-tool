@@ -20,7 +20,7 @@ app.post(
     async (req: Request, res: Response) => {
         try {
             const validationError = validationResult(req);
-            if (!validationError.isEmpty) {
+            if (!validationError.isEmpty()) {
                 res.status(400).json({
                     code: 400,
                     errors: validationError.mapped(),
