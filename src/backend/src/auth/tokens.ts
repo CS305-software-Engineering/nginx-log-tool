@@ -19,7 +19,7 @@ export interface agentTokenPayload {
 
 export function genAccessToken(
     payload: userTokenPayload | agentTokenPayload,
-    expiry: string = '30m'
+    expiry: string = '1h'
 ) {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET! as jwt.Secret, {
         expiresIn: expiry,
@@ -38,6 +38,8 @@ export function genRefreshToken(
 export function sendRefreshToken(res: Response, refreshToken: any) {
     res.cookie('rid', refreshToken, {
         httpOnly: true,
+        sameSite: 'none',
+        secure: true
         // path: '/refresh_token'
     });
 }
