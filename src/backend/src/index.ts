@@ -56,6 +56,11 @@ app.use('/aapi/agent', agent);
 app.use('/aapi/agent/static', staticMetrics);
 app.use('/aapi/agent/dyn', dynMetrics);
 
+// 404-page not found
+app.use((_req: Request, res: Response, _next: any) => {
+    res.status(404).send("Sorry can't find that");
+});
+
 app.get('/', (_req: Request, res: Response) => {
     res.send({ error: false });
 });

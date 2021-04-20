@@ -18,16 +18,16 @@ app.get(
                 agentId: req.params.agentId,
             });
             if (!agent) {
-                throw new Error('Invalid User or agent');
+                res.status(401).send({ message: 'Invalid User or agent' });
+            } else {
+                const resData = {
+                    os: agent?.osStaticMetrics ?? null,
+                    nginx: agent?.nginxStaticMetrics ?? null,
+                };
+                res.send({ metrics: resData });
             }
-            const resData = {
-                os: agent?.osStaticMetrics ?? null,
-                nginx: agent?.nginxStaticMetrics ?? null,
-            };
-            res.send({ metrics: resData });
         } catch (err) {
-            console.log(err);
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ message: err.message });
         }
     }
 );

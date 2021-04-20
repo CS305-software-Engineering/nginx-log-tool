@@ -15,18 +15,21 @@ app.put(
     async (req: Request, res: Response) => {
         try {
             if (req.body.timewindow === undefined) {
-                throw new Error(`Invalid timewindow ${req.body.timewindow}`);
+                res.status(400).send({
+                    message: `Invalid timewindow ${req.body.timewindow}`,
+                });
+            } else {
+                await User.updateOne(
+                    { email: res.locals.payload.email },
+                    { timewindow: req.body.timewindow }
+                );
+                res.send({
+                    error: false,
+                    message: 'timewindow updated successfully!',
+                });
             }
-            await User.updateOne(
-                { email: res.locals.payload.email },
-                { timewindow: req.body.timewindow }
-            );
-            res.send({
-                error: false,
-                message: 'timewindow updated successfully!',
-            });
         } catch (err) {
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ error: true, message: err.message });
         }
     }
 );

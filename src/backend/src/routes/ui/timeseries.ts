@@ -87,7 +87,7 @@ app.post(
             }
             res.send({ result });
         } catch (err) {
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ error: true, message: err.message });
         }
     }
 );
@@ -177,7 +177,7 @@ app.post(
             }
             res.send({ result });
         } catch (err) {
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ error: true, message: err.message });
         }
     }
 );

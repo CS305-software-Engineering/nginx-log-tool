@@ -51,7 +51,7 @@ app.post(
             );
             res.send({ error: false, message: 'Metrics added in DB!' });
         } catch (err) {
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ error: true, message: err.message });
         }
     }
 );

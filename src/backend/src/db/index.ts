@@ -9,6 +9,6 @@ export default async (dbURL: string) => {
         });
         console.log('Successfuly connected to db!');
     } catch (err) {
-        console.log({ error: true, message: err.message });
+        console.log({ error: true, message: err.message + '@db' });
     }
 };

@@ -30,28 +30,31 @@ app.post(
                 email: res.locals.payload.email,
             });
             if (!user) {
-                throw new Error('User or Agent does not exist');
-            }
-            const osMetrics: IOSStaticMetrics = req.body.osStaticMetrics;
-            const nginxMetrics: INGINXStaticMetrics =
-                req.body.nginxStaticMetrics;
-            await Agents.updateOne(
-                {
-                    agentId: res.locals.payload.agentId,
-                },
-                {
-                    $set: {
-                        osStaticMetrics: osMetrics,
-                        nginxStaticMetrics: nginxMetrics,
+                res.status(401).send({
+                    message: 'User or Agent does not exist',
+                });
+            } else {
+                const osMetrics: IOSStaticMetrics = req.body.osStaticMetrics;
+                const nginxMetrics: INGINXStaticMetrics =
+                    req.body.nginxStaticMetrics;
+                await Agents.updateOne(
+                    {
+                        agentId: res.locals.payload.agentId,
                     },
-                }
-            );
-            res.send({
-                error: false,
-                message: 'Successfully updated static metrics!',
-            });
+                    {
+                        $set: {
+                            osStaticMetrics: osMetrics,
+                            nginxStaticMetrics: nginxMetrics,
+                        },
+                    }
+                );
+                res.send({
+                    error: false,
+                    message: 'Successfully updated static metrics!',
+                });
+            }
         } catch (err) {
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ message: err.message });
         }
     }
 );

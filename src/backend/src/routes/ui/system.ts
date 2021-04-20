@@ -19,25 +19,26 @@ app.get(
                 email: res.locals.payload.email,
             }).populate('agents');
             if (!user) {
-                throw new Error('Invalid user');
-            }
-            const resData: any = [];
-            if (user.agents instanceof String) {
+                res.status(401).send({ message: 'Invalid User' });
             } else {
-                user.agents?.forEach((agent: any) => {
-                    resData.push({
-                        agentId: agent.agentId,
-                        status: agent.agentStatus,
-                        description: agent.agentDesc,
-                        setting: agent.agentSetting,
-                        lastActive: agent.lastActive,
-                        static: agent.osStaticMetrics,
+                const resData: any = [];
+                if (user.agents instanceof String) {
+                } else {
+                    user.agents?.forEach((agent: any) => {
+                        resData.push({
+                            agentId: agent.agentId,
+                            status: agent.agentStatus,
+                            description: agent.agentDesc,
+                            setting: agent.agentSetting,
+                            lastActive: agent.lastActive,
+                            static: agent.osStaticMetrics,
+                        });
                     });
-                });
+                }
+                res.send({ resData });
             }
-            res.send({ resData });
         } catch (err) {
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ error: true, message: err.message });
         }
     }
 );
