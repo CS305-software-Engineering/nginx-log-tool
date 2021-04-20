@@ -16,6 +16,7 @@ import { Link , useHistory} from 'react-router-dom';
 import { logOut } from '../../service/actions/user.actions';
 import {useDispatch} from 'react-redux';
 import axios from 'axios';
+import NotificationButton from './notification';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -125,7 +126,7 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
       <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </Menu>
   );
@@ -141,14 +142,14 @@ export default function PrimarySearchAppBar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      {/* <MenuItem>
         <IconButton aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="secondary">
             <MailIcon />
           </Badge>
         </IconButton>
         <p>Messages</p>
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem>
         <IconButton aria-label="show 11 new notifications" color="inherit">
           <Badge badgeContent={11} color="secondary">
@@ -212,16 +213,12 @@ export default function PrimarySearchAppBar() {
 
 
 
-            <IconButton aria-label="show 4 new mails" color="inherit">
+            {/* <IconButton aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />
               </Badge>
-            </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            </IconButton> */}
+           <NotificationButton />
             <IconButton
               edge="end"
               aria-label="account of current user"
