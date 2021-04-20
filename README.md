@@ -1,6 +1,6 @@
 # Nginx Log Tool
 
-A usefull tool to monitor performance in realtime and troubleshoot applications running on Nginx web servers.
+A handy tool to monitor performance in realtime and troubleshoot applications running on Nginx web servers.
 
 ## Project Design Overview
 **Nginx log tool** contains three components:
