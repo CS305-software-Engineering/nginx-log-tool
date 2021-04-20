@@ -19,6 +19,7 @@ import {useDispatch , useSelector} from 'react-redux';
 import { saveUser } from '../../service/actions/user.actions';
 
 
+
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
@@ -83,10 +84,15 @@ export default function LogIn() {
     })
     .then(res => {
       // console.log(res)
+      alert(res.data)
+
+      if (res.data.error)
+      alert(res.data.message)
+      else{
       dispatch(saveUser(res));
-    
+      // res.cookie('token', res.data.token, { httpOnly: true });
       // window.location.href = '/'
-      history.push('/');
+      }
     })
     .catch( error => {
       console.log(error)

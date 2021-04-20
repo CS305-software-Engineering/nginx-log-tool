@@ -5,20 +5,30 @@ import {axios} from 'axios';
 
 export const saveUser=(p)=>{
 
-    // console.log("action" , p.data);
+    console.log("action" , p.data);
     localStorage.setItem('access_token', p.data.token)
+
 
     return {
         type:SAVE_USER,
         data:p.data
     }
-    
+
+
+
 }
 
 export const authCheck=()=>{
     
     const accessToken = localStorage.getItem('access_token');
-    const flag = accessToken?true:false;
+    console.log("access token" , accessToken);
+    var flag = false;
+    if (accessToken == undefined){
+        flag = false;
+    }
+    else {
+        flag =true;
+    }
  
 
 

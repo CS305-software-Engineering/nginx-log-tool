@@ -14,15 +14,15 @@ import { authCheck } from './service/actions/user.actions';
 
 
 function App() {
+  const user = useSelector(state => state.userData)
 
   const dispatch = useDispatch();
   
   useEffect( () => {
     dispatch(authCheck());
-  }, [])
+  }, [user.isAuthenticated])
  
 
-  const user = useSelector(state => state.userData)
   console.log(user)
   return (
   <BrowserRouter>

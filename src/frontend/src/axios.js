@@ -13,6 +13,8 @@ const  axiosInstance = axios.create({
 		'Content-Type': 'application/json',
 		accept: 'application/json',
 	}, 
+	withCredentials: true
+
 });
 
 // axios.interceptors.request.use(
@@ -33,16 +35,29 @@ const  axiosInstance = axios.create({
   }, async function (error) {
 	const originalRequest = error.config;
 	// console.log("axIOS" , error.response)
-	if (error.response.error) {
+	if(error.response.status == 401)
+	{
+		window.location.href = '/';
+	}
+	if (error.response.status === 403 &&  error.response.data.message === "JsonWebTokenError"){
+		localStorage.removeItem('access_token');
+		window.location.href ='/';
+
+	}
+	if(error.response.status === 403 && error.response.data.message === 'TokenExpiredError')  {
+		console.log('This is interceptors')
 		axiosInstance
 		.post('refresh_token')
 		.then((response) => {
+			console.log("Intepceptor",response.data)
+			if(!response.data.error){
 			localStorage.setItem('access_token', response.data.token);
-
 			axiosInstance.defaults.headers['Authorization'] =
 				'Bearer ' + response.data.token;
 			originalRequest.headers['Authorization'] =
 				'Bearer ' + response.data.token;
+			}
+			
 			return axiosInstance(originalRequest);
 		})
 		.catch((err) => {

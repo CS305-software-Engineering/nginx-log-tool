@@ -112,7 +112,7 @@ export default function PrimarySearchAppBar() {
   const handleLogout =() =>{
 
     dispatch(logOut());
-    history.push('/');
+    window.location.href ='/';
   }
 
   const menuId = 'primary-search-account-menu';

@@ -83,21 +83,25 @@ export default function NotificationButton() {
         </Badge>
       </IconButton>
       
-      <StyledMenu
+      <Menu
         id="customized-menu"
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-       <div spacing={2} className={classes.root}>
-       <Alert severity="error" onClose={() => {}}>This is a error alert — check it out!</Alert>
-
+      <MenuItem>
+      <Alert severity="error" onClose={() => {}}>This is a error alert — check it out!</Alert>
+      </MenuItem>
       <Alert onClose={() => {}}>This is a success alert — check it out!</Alert>
+      <MenuItem>
       <Alert onClose={() => {}}>This is a success alert — check it out!</Alert>
+      </MenuItem>
       <Alert severity="warning" onClose={() => {}}>This is a WARNING alert — check it out!</Alert>
+      <MenuItem>
       <Alert severity="warning" onClose={() => {}}>This is a WARNING alert — check it out!</Alert>
-
+      </MenuItem>
+      <MenuItem>
       <Alert
         action={
           <Button color="inherit" size="small">
@@ -107,8 +111,8 @@ export default function NotificationButton() {
       >
         This is a success alert — check it out!
       </Alert>
-    </div>
-      </StyledMenu>
+      </MenuItem>
+      </Menu>
     </div>
   );
 }
