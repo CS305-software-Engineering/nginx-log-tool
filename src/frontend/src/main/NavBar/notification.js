@@ -90,18 +90,11 @@ export default function NotificationButton() {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-      <MenuItem>
       <Alert severity="error" onClose={() => {}}>This is a error alert — check it out!</Alert>
-      </MenuItem>
       <Alert onClose={() => {}}>This is a success alert — check it out!</Alert>
-      <MenuItem>
       <Alert onClose={() => {}}>This is a success alert — check it out!</Alert>
-      </MenuItem>
       <Alert severity="warning" onClose={() => {}}>This is a WARNING alert — check it out!</Alert>
-      <MenuItem>
       <Alert severity="warning" onClose={() => {}}>This is a WARNING alert — check it out!</Alert>
-      </MenuItem>
-      <MenuItem>
       <Alert
         action={
           <Button color="inherit" size="small">
@@ -111,7 +104,6 @@ export default function NotificationButton() {
       >
         This is a success alert — check it out!
       </Alert>
-      </MenuItem>
       </Menu>
     </div>
   );

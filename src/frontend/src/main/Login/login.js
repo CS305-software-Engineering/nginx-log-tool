@@ -5,7 +5,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import {  Link} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -14,11 +13,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
 import { useHistory } from "react-router-dom";
+import {  Link} from 'react-router-dom';
 
 import {useDispatch , useSelector} from 'react-redux';
 import { saveUser } from '../../service/actions/user.actions';
 
-
+import ForgotPassword from './updatePassword';
 
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
@@ -84,7 +84,6 @@ export default function LogIn() {
     })
     .then(res => {
       // console.log(res)
-      alert(res.data)
 
       if (res.data.error)
       alert(res.data.message)
@@ -173,9 +172,7 @@ export default function LogIn() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
+             {/* <ForgotPassword /> */}
             </Grid>
             <Grid item>
               <Link to="/register" variant="body2">

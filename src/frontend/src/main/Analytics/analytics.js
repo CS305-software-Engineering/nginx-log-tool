@@ -151,6 +151,17 @@ function getInstanceObjects(){
     getInstanceObjects();
   }, [])
 
+
+  const MINUTE_MS = 60000;
+
+useEffect(() => {
+
+  const interval = setInterval(() => {
+    console.log('Logs every minute');
+  }, MINUTE_MS );
+
+  return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+}, [])
     
   // useEffect( () => {
 

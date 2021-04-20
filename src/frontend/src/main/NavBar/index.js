@@ -11,13 +11,13 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
-
+import ForgotPassword from '../Login/updatePassword';
 import { Link , useHistory} from 'react-router-dom';
 import { logOut } from '../../service/actions/user.actions';
 import {useDispatch} from 'react-redux';
 import axios from 'axios';
 import NotificationButton from './notification';
-
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -126,7 +126,8 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
+             <ForgotPassword />
+ 
       <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </Menu>
   );
@@ -151,11 +152,7 @@ export default function PrimarySearchAppBar() {
         <p>Messages</p>
       </MenuItem> */}
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
+       < NotificationButton/>
         <p>Notifications</p>
       </MenuItem>
       <MenuItem onClick={handleProfileMenuOpen}>
@@ -193,16 +190,16 @@ export default function PrimarySearchAppBar() {
 
 
           {/* <Button color="inherit" >Overview</Button> */}
-          <Link to="/" style={{color:"white" ,  marginLeft:20 }} >
+          <Button component={Link} to='/' color="inherit" style={{marginLeft:20 }} variant="outlined">
             Overview
-          </Link>
-          <Link to="/analytics" style={{color:"white" ,  marginLeft:20 }} >
-            Analytics
-          </Link>
-          <Link to="/alerts" style={{color:"white" ,  marginLeft:20 }} >
-            Alerts
-          </Link>
-          
+          </Button>
+          <Button component={Link} to='/analytics' color="inherit" style={{marginLeft:20 }} variant="outlined">
+          Analytics
+          </Button>
+          <Button component={Link} to='/alerts' color="inherit" style={{marginLeft:20 }} variant="outlined">
+          Alerts
+          </Button>
+        
           {/* <Button color="inherit">Analytics</Button> */}
 
           {/* <Button color= "secondary">Alerts</Button> */}
