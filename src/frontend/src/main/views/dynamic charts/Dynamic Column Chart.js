@@ -12,6 +12,8 @@ class DynamicColumnChart extends Component {
 		setInterval(this.updateChart, updateInterval);
 	}
 	updateChart() {
+		if (this.chart)
+		{
 		var dpsColor, dpsTotal = 0, deltaY, yVal;
 		var dps = this.chart.options.data[0].dataPoints;
 		
@@ -25,6 +27,7 @@ class DynamicColumnChart extends Component {
 		this.chart.options.data[0].dataPoints = dps;
 		this.chart.options.title.text = "CPU Usage " + Math.round(dpsTotal / 6) + "%";
 		this.chart.render();
+		}
 	}
 	render() {
 		const options = {

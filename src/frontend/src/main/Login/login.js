@@ -5,7 +5,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import {  Link} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -14,16 +13,19 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
 import { useHistory } from "react-router-dom";
+import {  Link} from 'react-router-dom';
 
 import {useDispatch , useSelector} from 'react-redux';
 import { saveUser } from '../../service/actions/user.actions';
 
+import ForgotPassword from './updatePassword';
 
 import IconButton from '@material-ui/core/IconButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { Backdrop } from '@material-ui/core';
+import axiosInstance from '../../axios';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -77,15 +79,19 @@ export default function LogIn() {
       'password':password
     };
 
-    axios.post(`https://nginx-log-tool.herokuapp.com/wapi/auth/signin`, data, {
+    axiosInstance.post(`auth/signin`, data, {
       withCredentials: true,
     })
     .then(res => {
       // console.log(res)
-      dispatch(saveUser(res));
-    
 
-      history.push('/');
+      if (res.data.error)
+      alert(res.data.message)
+      else{
+      dispatch(saveUser(res));
+      // res.cookie('token', res.data.token, { httpOnly: true });
+      // window.location.href = '/'
+      }
     })
     .catch( error => {
       console.log(error)
@@ -166,9 +172,7 @@ export default function LogIn() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
+             {/* <ForgotPassword /> */}
             </Grid>
             <Grid item>
               <Link to="/register" variant="body2">

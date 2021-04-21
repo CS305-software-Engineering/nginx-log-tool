@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
-import Agent from '../../models/agents.model';
+import Agents from '../../models/agents.model';
 import { validationResult } from 'express-validator';
-import { INGINXStatisMetrics, IOSStaticMetrics } from '../../models/metrics';
+import { INGINXStaticMetrics, IOSStaticMetrics } from '../../models/metrics';
 import User from '../../models/user.model';
-import verifyAgent, { staticMetricsValidation } from './common';
+import { e_actor, verifyToken } from '../../auth/tokens';
+import { staticMetricsValidation } from '../../validators/index';
 
 const app = express.Router();
 
@@ -14,12 +15,12 @@ const app = express.Router();
  */
 app.post(
     '/',
-    verifyAgent,
+    verifyToken(e_actor.agent),
     staticMetricsValidation,
     async (req: Request, res: Response) => {
         try {
             const validationError = validationResult(req);
-            if (!validationError.isEmpty) {
+            if (!validationError.isEmpty()) {
                 res.status(400).json({
                     code: 400,
                     errors: validationError.mapped(),
@@ -29,29 +30,31 @@ app.post(
                 email: res.locals.payload.email,
             });
             if (!user) {
-                throw new Error('User or Agent does not exist');
-            }
-            const osMetrics: IOSStaticMetrics = req.body.osStaticMetrics;
-            const nginxMetrics: INGINXStatisMetrics =
-                req.body.nginxStaticMetrics;
-            await Agent.updateOne(
-                {
-                    'agents.agentId': res.locals.payload.agentId,
-                },
-                {
-                    $set: {
-                        osStaticMetrics: osMetrics,
-                        nginxStaticMetrics: nginxMetrics,
+                res.status(401).send({
+                    message: 'User or Agent does not exist',
+                });
+            } else {
+                const osMetrics: IOSStaticMetrics = req.body.osStaticMetrics;
+                const nginxMetrics: INGINXStaticMetrics =
+                    req.body.nginxStaticMetrics;
+                await Agents.updateOne(
+                    {
+                        agentId: res.locals.payload.agentId,
                     },
-                }
-            );
-
-            res.send({
-                error: false,
-                message: 'Successfully updated static metrics!',
-            });
+                    {
+                        $set: {
+                            osStaticMetrics: osMetrics,
+                            nginxStaticMetrics: nginxMetrics,
+                        },
+                    }
+                );
+                res.send({
+                    error: false,
+                    message: 'Successfully updated static metrics!',
+                });
+            }
         } catch (err) {
-            res.send({ error: true, message: err.message });
+            res.status(500).send({ message: err.message });
         }
     }
 );

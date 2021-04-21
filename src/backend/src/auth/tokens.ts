@@ -1,15 +1,33 @@
 import * as jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import { jwtpayload } from './index';
 
-export function genAccessToken(payload: jwtpayload, expiry: string = '30m') {
+export enum e_actor {
+    agent = 'agent',
+    user = 'user',
+}
+
+// payload type of user tokens used in webapp
+export interface userTokenPayload {
+    email: String;
+}
+
+// payload type of agent tokens used by collector agent
+export interface agentTokenPayload {
+    email: String;
+    agentId: String;
+}
+
+export function genAccessToken(
+    payload: userTokenPayload | agentTokenPayload,
+    expiry: string = '1h'
+) {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET! as jwt.Secret, {
         expiresIn: expiry,
     });
 }
 
 export function genRefreshToken(
-    payload: jwtpayload,
+    payload: userTokenPayload | agentTokenPayload,
     expiry: string = '30 days'
 ) {
     return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET! as jwt.Secret, {
@@ -20,23 +38,48 @@ export function genRefreshToken(
 export function sendRefreshToken(res: Response, refreshToken: any) {
     res.cookie('rid', refreshToken, {
         httpOnly: true,
+        sameSite: 'none',
+        secure: true
         // path: '/refresh_token'
     });
 }
 
-export const verifyToken = (req: Request, res: Response, next: any) => {
+export const verifyToken = (actor: string) => (
+    req: Request,
+    res: Response,
+    next: any
+) => {
     try {
         const auth = req.headers['authorization'] as String;
-        if (!auth.split(' ')[1]) {
-            throw new Error('please login first! (Not Authenticated)');
+        if (!auth?.split(' ')[1]) {
+            res.status(401).send({ message: 'Please login first!' });
+        } else {
+            const payload: any = jwt.verify(
+                auth.split(' ')[1],
+                process.env.ACCESS_TOKEN_SECRET as jwt.Secret
+            );
+            // check if the user has used the token of agent or vice-versa
+            if (
+                (actor === e_actor.agent && payload?.agentId === undefined) ||
+                (actor === e_actor.user && payload?.agentId !== undefined)
+            ) {
+                res.status(403).send({ message: 'Invalid User' });
+            } else {
+                res.locals.payload = payload;
+                return next();
+            }
         }
-        const payload: jwtpayload = jwt.verify(
-            auth.split(' ')[1],
-            process.env.ACCESS_TOKEN_SECRET as jwt.Secret
-        ) as jwtpayload;
-        res.locals.payload = payload;
-        return next();
     } catch (err) {
-        return res.send({ error: true, message: err.message });
+        if (
+            [
+                'TokenExpiredError',
+                'JsonWebTokenError',
+                'NotBeforeError',
+            ].includes(err?.name)
+        ) {
+            res.status(403).send({ error: true, message: err.name });
+        } else {
+            return res.status(500).send({ error: true, message: err.message });
+        }
     }
 };

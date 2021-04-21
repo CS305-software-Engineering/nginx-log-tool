@@ -4,19 +4,20 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
-
+import ForgotPassword from '../Login/updatePassword';
 import { Link , useHistory} from 'react-router-dom';
 import { logOut } from '../../service/actions/user.actions';
 import {useDispatch} from 'react-redux';
+import axios from 'axios';
+import NotificationButton from './notification';
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -109,8 +110,9 @@ export default function PrimarySearchAppBar() {
   };
 
   const handleLogout =() =>{
+
     dispatch(logOut());
-    history.push('/');
+    window.location.href ='/';
   }
 
   const menuId = 'primary-search-account-menu';
@@ -124,7 +126,8 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+             <ForgotPassword />
+ 
       <MenuItem onClick={handleLogout}>Logout</MenuItem>
     </Menu>
   );
@@ -140,20 +143,16 @@ export default function PrimarySearchAppBar() {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
+      {/* <MenuItem>
         <IconButton aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="secondary">
             <MailIcon />
           </Badge>
         </IconButton>
         <p>Messages</p>
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
+       < NotificationButton/>
         <p>Notifications</p>
       </MenuItem>
       <MenuItem onClick={handleProfileMenuOpen}>
@@ -186,33 +185,21 @@ export default function PrimarySearchAppBar() {
           <Typography className={classes.title} variant="h6" noWrap>
             NGINX-LOG-TOOL
           </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </div>
+         
           <div className={classes.grow} />
 
 
           {/* <Button color="inherit" >Overview</Button> */}
-          <Link to="/" style={{color:"white" ,  marginLeft:20 }} >
+          <Button component={Link} to='/' color="inherit" style={{marginLeft:20 }} variant="outlined">
             Overview
-          </Link>
-          <Link to="/analytics" style={{color:"white" ,  marginLeft:20 }} >
-            Analytics
-          </Link>
-          <Link to="/alerts" style={{color:"white" ,  marginLeft:20 }} >
-            Alerts
-          </Link>
-          
+          </Button>
+          <Button component={Link} to='/analytics' color="inherit" style={{marginLeft:20 }} variant="outlined">
+          Analytics
+          </Button>
+          <Button component={Link} to='/alerts' color="inherit" style={{marginLeft:20 }} variant="outlined">
+          Alerts
+          </Button>
+        
           {/* <Button color="inherit">Analytics</Button> */}
 
           {/* <Button color= "secondary">Alerts</Button> */}
@@ -223,16 +210,12 @@ export default function PrimarySearchAppBar() {
 
 
 
-            <IconButton aria-label="show 4 new mails" color="inherit">
+            {/* <IconButton aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />
               </Badge>
-            </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            </IconButton> */}
+           <NotificationButton />
             <IconButton
               edge="end"
               aria-label="account of current user"

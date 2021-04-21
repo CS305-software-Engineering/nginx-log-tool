@@ -14,15 +14,15 @@ import { authCheck } from './service/actions/user.actions';
 
 
 function App() {
+  const user = useSelector(state => state.userData)
 
   const dispatch = useDispatch();
   
   useEffect( () => {
     dispatch(authCheck());
-  }, [])
+  }, [user.isAuthenticated])
  
 
-  const user = useSelector(state => state.userData)
   console.log(user)
   return (
   <BrowserRouter>
@@ -33,11 +33,23 @@ function App() {
           </Route>
  
           <Route path="/analytics">
-            <Analytics />
+          {
+              !user.isAuthenticated ?   
+                <Login />
+              :
+              <Analytics />
+            }
+          
           </Route>
           
           <Route path="/alerts">
-          <Alerts />
+          {
+              !user.isAuthenticated ?   
+                <Login />
+              :
+              <Alerts />
+            }
+
           </Route>
           <Route path="/">
 
@@ -46,7 +58,6 @@ function App() {
                 <Login />
               :
               <Overview />
-              // <Template />
 
             }
 

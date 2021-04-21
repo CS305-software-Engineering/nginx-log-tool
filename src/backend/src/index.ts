@@ -12,11 +12,11 @@ import system from './routes/ui/system';
 import metrics from './routes/ui/metrics';
 import timewindow from './routes/ui/timewindow';
 import timeseries from './routes/ui/timeseries';
+import user from './routes/ui/user';
 
 dotenv.config();
 const app = express();
 
-console.log((process.env.CLIENT_URL as string) ?? '/');
 // middleware
 app.use(
     cors({
@@ -51,16 +51,22 @@ app.use('/wapi/system', system);
 app.use('/wapi/metrics', metrics);
 app.use('/wapi/tw', timewindow);
 app.use('/wapi/timeseries', timeseries);
+app.use('/wapi/user', user);
 
 // agent routes
 app.use('/aapi/agent', agent);
 app.use('/aapi/agent/static', staticMetrics);
 app.use('/aapi/agent/dyn', dynMetrics);
 
+// 404-page not found
+app.use((_req: Request, res: Response, _next: any) => {
+    res.status(404).send("Sorry can't find that");
+});
+
 app.get('/', (_req: Request, res: Response) => {
     res.send({ error: false });
 });
 
 app.listen(process.env.PORT ?? 3000, () => {
-    console.log(`server is running at port:${process.env.SERVER_PORT ?? 3000}`);
+    console.log(`server is running at port:${process.env.PORT ?? 3000}`);
 });

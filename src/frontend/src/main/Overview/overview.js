@@ -15,6 +15,8 @@ import StepLineChart from '../views/line charts/Step Line Chart';
 import LineChartCanvas from '../views/line charts/Line Chart';
 import FunnelChartWithCustomization from '../views/pie & funnel charts/Funnel Chart with Custom Neck';
 import DoughnutChart from '../views/pie & funnel charts/Doughnut Chart';
+import { useEffect } from 'react';
+import axiosInstance from '../../axios';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -31,7 +33,20 @@ function Overview() {
 
   const classes = useStyles();
   const user = useSelector(state => state.userData)
-  console.log(user)
+  
+  useEffect( () => {
+
+    axiosInstance.get(`system/objects`)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+
+  }, [])
+ 
  
   return (
     <div>

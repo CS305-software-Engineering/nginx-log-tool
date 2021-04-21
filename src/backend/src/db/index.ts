@@ -1,13 +1,14 @@
 import { connect } from 'mongoose';
 
-export default (dbURL: string) => {
+export default async (dbURL: string) => {
     try {
-        connect(dbURL, {
+        await connect(dbURL, {
             useNewUrlParser: true,
             useCreateIndex: true,
             useUnifiedTopology: true,
-        }).then(() => console.log('Successfuly connected to db!'));
+        });
+        console.log('Successfuly connected to db!');
     } catch (err) {
-        console.log({ error: true, message: err.message });
+        console.log({ error: true, message: err.message + '@db' });
     }
 };

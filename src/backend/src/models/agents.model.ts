@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import ITSMetrics, { INGINXStatisMetrics, IOSStaticMetrics } from './metrics';
+import ITSMetric, { INGINXStaticMetrics, IOSStaticMetrics } from './metrics';
 
 export enum e_agentStatus {
     offline = 'OFFLINE',
@@ -24,9 +24,9 @@ export interface IAgent extends Document {
     agentStatus?: e_agentStatus;
     lastActive?: Number;
     meta: Schema.Types.Mixed;
-    tsMetrics?: Array<ITSMetrics>;
+    tsMetrics?: Array<ITSMetric>;
     osStaticMetrics?: IOSStaticMetrics;
-    nginxStaticMetrics?: INGINXStatisMetrics;
+    nginxStaticMetrics?: INGINXStaticMetrics;
 }
 
 const agentSchema: Schema = new Schema({

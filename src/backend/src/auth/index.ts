@@ -1,21 +1,18 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { validationResult } from 'express-validator';
-import { signupValidation, signinValidation } from './utils';
+import { signupValidation, signinValidation } from '../validators/index';
 import {
     verifyToken,
     genAccessToken,
     genRefreshToken,
     sendRefreshToken,
+    userTokenPayload,
 } from './tokens';
 import User from '../models/user.model';
 import mongoose from 'mongoose';
 
 const app = express.Router();
-
-export interface jwtpayload {
-    email: String;
-}
 
 /**
  * @route           POST /auth/signup
@@ -84,9 +81,9 @@ app.post('/signin', signinValidation, async (req: Request, res: Response) => {
         if (!checkPass) {
             throw new Error('email or password is invalid');
         }
-        const payload: jwtpayload = {
+        const payload: userTokenPayload = {
             email: instance.email,
-        } as jwtpayload;
+        } as userTokenPayload;
         // login successful
         // send access and refresh tokens
         sendRefreshToken(res, genRefreshToken(payload));
@@ -104,7 +101,7 @@ app.post('/signin', signinValidation, async (req: Request, res: Response) => {
  * @description     Logout request: removes cookie
  * @access          Public
  */
-app.post('/signout', verifyToken, async (req: Request, res: Response) => {
+app.post('/signout', verifyToken, async (_req: Request, res: Response) => {
     try {
         res.clearCookie('rid');
         res.send({ error: false, message: 'logged out!' });
