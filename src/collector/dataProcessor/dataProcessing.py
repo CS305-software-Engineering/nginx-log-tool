@@ -30,6 +30,7 @@ def threaded(fn):
 
 
 class dataProcessor():
+    """Constructor"""
     def __init__(self):
         self.nginxCollector = nginxCollectionAgent()
         self.systemCollector = systemCollectionAgent()
