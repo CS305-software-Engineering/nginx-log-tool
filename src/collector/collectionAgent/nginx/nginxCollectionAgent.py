@@ -136,6 +136,7 @@ class nginxCollectionAgent:
         for thread in handles:
             thread.join()
         print('threads completed')
+        self.data['timestamp']*=1000 # for the differnce of unix time in python and Node.
         return self.data
 
 agent=nginxCollectionAgent()

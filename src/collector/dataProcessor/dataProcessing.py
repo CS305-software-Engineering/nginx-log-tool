@@ -46,7 +46,7 @@ class dataProcessor():
         
         #API call
         try:
-            response=requests.post('http://nginx-log-tool.herokuapp.com/aapi/agent/static',json=data, headers={
+            response=requests.post('http://nginx-log-tool.herokuapp.com/aapi/agent/dyn',json=data, headers={
                 'Authorization':'Bearer '+os.environ.get("TOKEN")
             }) 
             print(data[0])
