@@ -34,18 +34,18 @@ function Overview() {
   const classes = useStyles();
   const user = useSelector(state => state.userData)
   
-  useEffect( () => {
+  // useEffect( () => {
 
-    axiosInstance.get(`system/objects`)
-    .then(function (response) {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  //   axiosInstance.get(`system/objects`)
+  //   .then(function (response) {
+  //     console.log(JSON.stringify(response.data));
+  //   })
+  //   .catch(function (error) {
+  //     console.log(error);
+  //   });
 
 
-  }, [])
+  // }, [])
  
  
   return (

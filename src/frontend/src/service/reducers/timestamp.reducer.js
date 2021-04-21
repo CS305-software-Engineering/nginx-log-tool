@@ -1,16 +1,16 @@
      
      
-import {SAVE_TIME, SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ} from '../constants';
+import {SAVE_TIME} from '../constants';
 
-const data = {}
+const data ={}
 
-export default function timeseriesReducer(state=data, action){
+export default function timestampReducer(state=data, action){
 
     switch(action.type) {
-        case SAVE_TIMESERIES_SEQ:
+        case SAVE_TIME:
             return {
                 ...state,
-                data: action.data,
+                timestamp: action.data,
             }
         
         // case UPDATE_TIMESERIES_SEQ:

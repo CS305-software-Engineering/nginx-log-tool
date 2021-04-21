@@ -11,7 +11,7 @@ const LineChart = (props) => {
     labels:  props.x,
     datasets: [
       {
-        label: '# of Votes',
+        label: props.data.metric,
         data: props.y,
         fill: false,
         backgroundColor: 'rgb(255, 99, 132)',

@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 
 import {useSelector , useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { authCheck } from './service/actions/user.actions';
+import { authCheck, saveTimeStamp } from './service/actions/user.actions';
 
 
 
@@ -20,7 +20,8 @@ function App() {
   
   useEffect( () => {
     dispatch(authCheck());
-  }, [user.isAuthenticated])
+    dispatch(saveTimeStamp(Math.floor(Date.now())));
+  }, [])
  
 
   console.log(user)
@@ -57,7 +58,7 @@ function App() {
               !user.isAuthenticated ?   
                 <Login />
               :
-              <Overview />
+              <Analytics />
 
             }
 

@@ -190,9 +190,9 @@ export default function PrimarySearchAppBar() {
 
 
           {/* <Button color="inherit" >Overview</Button> */}
-          <Button component={Link} to='/' color="inherit" style={{marginLeft:20 }} variant="outlined">
+          {/* <Button component={Link} to='/' color="inherit" style={{marginLeft:20 }} variant="outlined">
             Overview
-          </Button>
+          </Button> */}
           <Button component={Link} to='/analytics' color="inherit" style={{marginLeft:20 }} variant="outlined">
           Analytics
           </Button>

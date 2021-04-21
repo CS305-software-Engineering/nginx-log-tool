@@ -1,10 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import {fade,  makeStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
 
@@ -29,11 +24,52 @@ import Avatar from '@material-ui/core/Avatar';
 
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { addInstance ,saveTimeSeriesData } from '../../service/actions/user.actions';
+import { addInstance ,saveTimeSeriesData, saveTimeStamp } from '../../service/actions/user.actions';
 
 import AddInstanceDialog from './createInstanceDialog';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+import PropTypes from 'prop-types';
 
 // sample agent id 5505d27ea1c7f1509736b60f3d081923b12eedfc
+
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -89,33 +125,49 @@ const useStyles = makeStyles((theme) => ({
 export default function Analytics() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  
+  const [currAgent , setCurrentAgent] = useState(null); 
   const instanceArray = useSelector(state => state.instanceData)
   const timeseriesData = useSelector(state => state.timeseriesData)
+  const timestamp = useSelector(state => state.timestamp);
+  console.log("tHIS IS AGENT DETAILS" , instanceArray);
+  console.log("timestamp" , timestamp);
+  const [value, setValue] = React.useState(0);
 
+  const [graphData,setGraphData] = React.useState([]); 
 
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
 function handleVisualise(agentId){
 
 //  console.log(agentId)
-
-
+//  setCurrentAgent(agentId);
+  const times  = 3600000;
+  const currenttime = Math.floor(Date.now());
   const data = {
     "metrics": [
         {
-            "from": 1618071100000,
-            "to": 1618071300000,
-            "metric": "cpuCount",
+            "from": currenttime - times,
+            "to": currenttime,
+            "metric": "httpStatus2xx",
             "granularity": "1m",
             "agentId": agentId
         },
-         {
-            "from": 1618071100000,
-            "to": 1618071300000,
-            "metric": "currentConnections",
-            "granularity": "1m",
-            "agentId": agentId
-        }
+        {
+          "from": currenttime - times,
+          "to": currenttime,
+          "metric": "httpStatus4xx",
+          "granularity": "1m",
+          "agentId": agentId
+      },
+      {
+        "from": currenttime - times,
+        "to": currenttime,
+        "metric": "httpStatus5xx",
+        "granularity": "1m",
+        "agentId": agentId
+    },
     ]
 };
 
@@ -123,6 +175,7 @@ function handleVisualise(agentId){
     .then(function (response) {
       // console.log(response.data);
       dispatch( saveTimeSeriesData(  response) );
+      setGraphData(response.data);
     })
     .catch(function (error) {
       console.log(error);
@@ -131,13 +184,20 @@ function handleVisualise(agentId){
 
 }
 
+function xAxisChanger(data, newData)
+{
+    data.shift();
+    data.push(newData);
+    return data;
+}    
+
 
 function getInstanceObjects(){
 
 
   axiosInstance.get(`system/objects`)
   .then(function (response) {
-    // console.log(JSON.stringify(response.data));
+    console.log(JSON.stringify(response.data));
     dispatch(addInstance(response));
   })
   .catch(function (error) {
@@ -152,43 +212,74 @@ function getInstanceObjects(){
   }, [])
 
 
-  const MINUTE_MS = 60000;
+  const MINUTE_MS = 5000;
 
 useEffect(() => {
 
+
   const interval = setInterval(() => {
+    // handleVisualise();
+    const agentId = "5505d27ea1c7f1509736b60f3d081923b12eedfc";
     console.log('Logs every minute');
+    const starttime = timestamp.timestamp;
+    console.log("starttime" , starttime);
+    const times = 60000;
+    const data = {
+      "metrics": [
+          {
+              "from": starttime ,
+              "to": starttime+ times,
+              "metric": "httpStatus2xx",
+              "granularity": "1m",
+              "agentId": agentId
+          },
+          {
+            "from": starttime ,
+            "to": starttime + times,
+            "metric": "httpStatus4xx",
+            "granularity": "1m",
+            "agentId": agentId
+        },
+        {
+          "from": starttime,
+          "to": starttime+ times,
+          "metric": "httpStatus5xx",
+          "granularity": "1m",
+          "agentId": agentId
+      },
+      ]
+  };
+  
+      axiosInstance.post(`timeseries/seq` , data )
+      .then(function (response) {
+        // console.log(response.data);
+        dispatch( saveTimeSeriesData(  response) );
+        dispatch(saveTimeStamp(times))
+
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  
+    
+
+
   }, MINUTE_MS );
 
   return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
 }, [])
     
-  // useEffect( () => {
-
-  //   axiosInstance.post(`timeseries/seq` , data )
-  //   .then(function (response) {
-  //     console.log(JSON.stringify(response.data));
-
-      
-
-
-  //   })
-  //   .catch(function (error) {
-  //     console.log(error);
-  //   });
-
-
-  // }, [])
  
-// console.log(instanceArray.instanceData);
-console.log(timeseriesData)
+console.log("timeseries data",timeseriesData)
 
 function getX(l){
 
   var list_ = []
   l.map((value) => {
-
-    list_.push(value._id);
+    var date = new Date(value._id);
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    list_.push(`${hours}:${minutes}`);
   }
   );
  return list_;
@@ -203,6 +294,8 @@ function getY(l){
     list_.push(value.value);
   }
   );
+
+
   return list_;
 
 }
@@ -214,7 +307,7 @@ function getY(l){
       <div className={classes.root}>
       <Grid container >
       
-        <Grid item xs={3} >
+        <Grid item xs={2} >
         <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -273,77 +366,46 @@ function getY(l){
           <Divider orientation="vertical" ></Divider>
         </Grid>
 
-        <Grid item xs={8} >
+        <Grid item xs={9} >
 
             <Container >
-            <Grid container spacing = {1}>
+              <br></br>
+            <AppBar style={{backgroundColor:"whitesmoke" , color:"black" }} position="static">
+                  <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+                    <Tab  label="Static/System Metrics" {...a11yProps(0)} />
+                    <Tab  label="Dynamic/Nginx Metrics" {...a11yProps(1)} />
 
+                  </Tabs>
+                </AppBar>
+                <TabPanel value={value} index={0}>
+                <h1 className='title' style={{textAlign:"center"}}>System Metrics</h1>
 
+                </TabPanel>
+                <TabPanel value={value} index={1}>
+                <h1 className='title' style={{textAlign:"center"}}>NGINX Metrics</h1>
 
+                <Grid container spacing = {1}>
 
-              { timeseriesData.data != undefined ? timeseriesData.data.result.map((value) => {
-                return (
-              <Grid item lg = {6} md={6}  xs={12}>
+                    { timeseriesData.data != undefined ? timeseriesData.data.result.map((value) => {
+                      return (
+                    <Grid item lg = {12} md={6}  xs={12}>
 
-                <Paper elevation={2}>
-                  <LineChart  data = {value} x = {getX(value.timeseries)} y = {getY(value.timeseries)}/>
-                 </Paper>
-              </Grid> 
-              );
-            })
-          : "Click on Any Instance to Visualise"}
-              {/* <Grid item lg = {4} md={6} xs={12}>
-                <Paper className={classes.paper}>
-                  <LineChart title="HTTP 5xx errors"/>
-                </Paper>
-              </Grid>
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                <LineChart title="HTTP 4xx errors"/>
+                      <Paper elevation={2}>
+                        <LineChart  data = {value} x = {getX(value.timeseries)} y = {getY(value.timeseries)}/>
+                      </Paper>
+                    </Grid> 
+                    );
+                    })
+                    :  <Grid item lg = {12} md={12}  xs={12}>
+                    Click on any Instance to visualise!!!
+                    </Grid> }
 
-                </Paper>
-              </Grid>
-       
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                <LineChart title="CPU usage"/>
-
-                </Paper>
-              </Grid>
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                <LineChart title="Traffic"/>
-
-                </Paper>
-              </Grid>
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                <LineChart title="Request time"/>
-
-                </Paper>
-                
-              </Grid>
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                <LineChart title="CPU usage"/>
-
-                </Paper>
-              </Grid>
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                <LineChart title="Traffic"/>
-
-                </Paper>
-              </Grid>
-              <Grid item lg = {4} md={6}  xs={12}>
-                <Paper className={classes.paper}>
-                <LineChart title="Request time"/>
-
-                </Paper>
-                
-              </Grid> */}
-            </Grid>
+                    </Grid>
+                </TabPanel>
+          
             </Container>
+
+
         </Grid>
       
       </Grid>

@@ -1,4 +1,4 @@
-import {SAVE_USER , LOGOUT_USER ,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE , SAVE_TIMESERIES_SEQ} from '../constants';
+import {SAVE_TIME, SAVE_USER , LOGOUT_USER ,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE , SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ} from '../constants';
 
 import {axios} from 'axios';
 
@@ -61,5 +61,19 @@ export const saveTimeSeriesData = ( p) =>{
     return {
         type:SAVE_TIMESERIES_SEQ,
         data:p.data
+    }
+}
+
+// export const updateTimeSeriesData = (p) =>{
+//     return {
+//         type:UPDATE_TIMESERIES_SEQ,
+//         data:p.data
+//     }
+// }
+
+export const saveTimeStamp = (x)  =>{
+    return {
+        type:SAVE_TIME,
+        data:x
     }
 }
