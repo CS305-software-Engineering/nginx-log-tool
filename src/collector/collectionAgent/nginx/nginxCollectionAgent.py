@@ -1,6 +1,7 @@
 from os import access
 import sys
-sys.path.append('src/collector')
+sys.path.append('../../')
+print(sys.path)
 from utility.threads import threaded
 import requests
 import random
@@ -12,8 +13,31 @@ from datetime import datetime
 class nginxCollectionAgent:
     """Constructor"""
     def __init__(self):
-        self.data={} # the data dictionary storing all values. 
-       
+        self.data={
+            'timeStamp':0.0,
+            'getMethods':0,
+            'headMethods':0,
+            'postMethods':0,
+            'putMethods':0,
+            'deleteMethods':0,
+            'optionsMethods':0,
+            'httpStatus1xx':0,
+            'httpStatus2xx':0,
+            'httpStatus3xx':0,
+            'httpStatus4xx':0,
+            'httpStatus5xx':0,
+            'httpStatus403':0,
+            'httpStatus404':0,
+            'httpStatus500,':0,
+            'httpStatus502':0,
+            'httpStatus503':0,
+            'httpStatus504':0,
+            'httpStatusDiscarded':0,
+            'protocolHttp_v1_0':0,
+            'protocolHttp_v0_9':0,
+            'protocolHttp_v1_1':0,
+            'protocolHttp_v2':0,
+        }
         self.collectorFunctions=[ 
             self.getHttpConnectionsMetrics, # for stub status metrics
             self.getAccessLogs # for 
@@ -21,8 +45,8 @@ class nginxCollectionAgent:
         self.meta={
             'stubStatusUrl':'http://127.0.0.1/nginx_status',
             'accessLogPath':'/var/log/nginx/access.log',
-            'storePath':'src/collector/collectionAgent/store.pkl'
-        } # variables to store important paths and urls as meta deta. 
+            'storePath':'../store.pkl'
+        }
         latestMetrics={
             'timeStamp':0.0,
             'getMethods':0,
@@ -145,9 +169,9 @@ class nginxCollectionAgent:
         for thread in handles:
             thread.join()## joining all the threads to wait for completion
         print('threads completed')
-        
         return self.data
 
+        
 agent=nginxCollectionAgent()
-# print(agent.setData())
+print(agent.setData())
 

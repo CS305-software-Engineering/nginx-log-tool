@@ -1,0 +1,156 @@
+Metadata-Version: 2.0
+Name: file-read-backwards
+Version: 2.0.0
+Summary: Memory efficient way of reading files line-by-line from the end of file
+Home-page: https://github.com/RobinNil/file_read_backwards
+Author: Robin Robin
+Author-email: robinsquare42@gmail.com
+License: MIT license
+Keywords: file_read_backwards
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+
+===============================
+file_read_backwards
+===============================
+
+
+.. image:: https://img.shields.io/pypi/v/file_read_backwards.svg
+        :target: https://pypi.python.org/pypi/file_read_backwards
+
+.. image:: https://img.shields.io/travis/RobinNil/file_read_backwards.svg?branch=master
+        :target: https://travis-ci.org/RobinNil/file_read_backwards.svg?branch=master
+
+.. image:: https://readthedocs.org/projects/file-read-backwards/badge/?version=latest
+        :target: https://file-read-backwards.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
+
+.. image:: https://pyup.io/repos/github/RobinNil/file_read_backwards/shield.svg
+     :target: https://pyup.io/repos/github/RobinNil/file_read_backwards/
+     :alt: Updates
+
+
+Memory efficient way of reading files line-by-line from the end of file
+
+
+* Free software: MIT license
+* Documentation: https://file-read-backwards.readthedocs.io.
+
+
+Features
+--------
+
+This package is for reading file backward line by line as unicode in a memory efficient manner for both Python 2.7 and Python 3.
+
+It currently supports ascii, latin-1, and utf-8 encodings.
+
+It supports "\\r", "\\r\\n", and "\\n" as new lines.
+
+Usage Examples
+--------------
+
+An example of using `file_read_backwards` for `python2.7`::
+
+    #!/usr/bin/env python2.7
+
+    from file_read_backwards import FileReadBackwards
+
+    with FileReadBackwards("/tmp/file", encoding="utf-8") as frb:
+
+        # getting lines by lines starting from the last line up
+        for l in frb:
+            print l
+
+Another example using `python3.3`::
+
+    from file_read_backwards import FileReadBackwards
+
+    with FileReadBackwards("/tmp/file", encoding="utf-8") as frb:
+
+        # getting lines by lines starting from the last line up
+        for l in frb:
+            print(l)
+
+
+Another way to consume the file is via `readline()`, in `python3.3`::
+
+    from file_read_backwards import FileReadBackwards
+
+    with FileReadBackwards("/tmp/file", encoding="utf-8") as frb:
+
+        while True:
+            l = frb.readline()
+            if not l:
+                break
+            print(l, end="")
+
+Credits
+---------
+
+This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+
+.. _Cookiecutter: https://github.com/audreyr/cookiecutter
+.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+
+
+
+=======
+History
+=======
+
+1.0.0 (2016-12-18)
+------------------
+
+* First release on PyPI.
+
+1.1.0 (2016-12-31)
+------------------
+
+* Added support for "latin-1".
+* Marked the package "Production/Stable".
+
+1.1.1 (2017-01-09)
+------------------
+
+* Updated README.rst for more clarity around encoding support and Python 2.7 and 3 support.
+
+1.1.2 (2017-01-11)
+------------------
+
+* Documentation re-arrangement. Usage examples are now in README.rst
+* Minor refactoring
+
+1.2.0 (2017-09-01)
+------------------
+
+* Include context manager style as it provides cleaner/automatic close functionality
+
+1.2.1 (2017-09-02)
+------------------
+
+* Made doc strings consistent to Google style and some code linting
+
+
+1.2.2 (2017-11-19)
+------------------
+
+* Re-release of 1.2.1 for ease of updating pypi page for updated travis & pyup.
+
+2.0.0 (2018-03-23)
+------------------
+
+Mimicing Python file object behavior.
+
+* FileReadBackwards no longer creates multiple iterators (a change of behavior from 1.x.y version)
+* Adding readline() function retuns one line at a time with a trailing new line and empty string when it reaches end of file.
+  The fine print: the trailing new line will be `os.linesep` (rather than whichever new line type in the file).
+
+
