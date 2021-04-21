@@ -5,6 +5,11 @@ export enum e_aggrFunc {
     avg = 'avg',
 }
 
+export enum e_typeSys {
+    os = 'os',
+    nginx = 'nginx',
+}
+
 export interface ITSMetricsReq {
     to: Number;
     from: Number;
@@ -22,6 +27,7 @@ export interface IMetricDesc {
     id?: Number;
     value: any;
     category?: String;
+    type: String;
 }
 
 export interface IOSStaticMetrics {

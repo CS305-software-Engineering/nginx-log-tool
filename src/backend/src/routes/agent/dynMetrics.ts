@@ -24,6 +24,7 @@ app.post(
                         value: element.osDynamicMetrics[key]?.value,
                         source: element.osDynamicMetrics[key]?.source,
                         category: element.osDynamicMetrics[key]?.category,
+                        type: 'os',
                     };
                     metrics.push(metricDesc);
                 });
@@ -33,11 +34,12 @@ app.post(
                         value: element.nginxDynamicMetrics[key]?.value,
                         source: element.nginxDynamicMetrics[key]?.source,
                         category: element.nginxDynamicMetrics[key]?.category,
+                        type: 'nginx',
                     };
                     metrics.push(metricDesc);
                 });
                 tsData.push(({
-                    timestamp: new Date(element.timestamp),
+                    timestamp: element.timestamp,
                     metrics: metrics,
                 } as unknown) as ITSMetric);
             });

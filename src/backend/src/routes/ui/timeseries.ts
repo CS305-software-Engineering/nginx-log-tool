@@ -31,7 +31,10 @@ app.post(
             const len = (req.body?.metrics).length ?? 0;
             for (let i = 0; i < len; i++) {
                 const query: ITSMetricsReq = req.body.metrics[i];
-                const boundaries = [query.from as number, query.to as number];
+                const boundaries = [
+                    (query.from as number) + 0.1,
+                    (query.to as number) + 0.1,
+                ];
                 const queryOut = await Agents.aggregate([
                     // find the agent with given agentID
                     {
@@ -94,10 +97,10 @@ app.post(
 
 // function to calculte bountry values for bucketting document on timestamp
 const getBoundries = (granularity: String, to: number, from: number) => {
-    const boundaries: number[] = [from];
+    const boundaries: number[] = [from + 1];
     let b = from;
-    while (b <= to) {
-        boundaries.push(b + granulMap.get(granularity)!);
+    while (b < to) {
+        boundaries.push(b + granulMap.get(granularity)! + 1);
         b += granulMap.get(granularity)!;
     }
     return boundaries;
@@ -164,11 +167,38 @@ app.post(
                         },
                     },
                 ]);
+                const queryOutTemp = new Map<Number, any>();
+                const queryOut_len = queryOut?.length;
+                for (let j = 1; j < boundaries.length; j++) {
+                    queryOutTemp.set(boundaries[j] - 1, {
+                        _id: boundaries[j] - 1,
+                        value: null,
+                    });
+                }
+                for (let j = 1; j < queryOut_len; j++) {
+                    queryOutTemp.set(queryOut[j]?._id - 1, {
+                        _id: queryOut[j]?._id - 1,
+                        value: queryOut[j - 1]?.value,
+                    });
+                }
+                // add the last timestamp value
+                queryOutTemp.set(
+                    queryOut[queryOut_len - 1]?._id -
+                        1 +
+                        granulMap.get(query.granularity)!,
+                    {
+                        _id:
+                            queryOut[queryOut_len - 1]?._id -
+                            1 +
+                            granulMap.get(query.granularity)!,
+                        value: queryOut[queryOut_len - 1]?.value,
+                    }
+                );
                 result.push({
                     from: query.from,
                     to: query.to,
                     metric: query.metric,
-                    timeseries: queryOut,
+                    timeseries: [...queryOutTemp.values()],
                     combine_fn: query.combine_fn,
                     aggr_fn: query.aggr_fn,
                     granularity: query.granularity,
