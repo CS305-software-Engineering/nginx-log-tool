@@ -28,13 +28,14 @@ class dataProcessor():
             'nginxDynamicMetrics':self.nginxCollector.setData(),
             'osDynamicMetrics':self.systemCollector.setData()
         }
-        queue=persistqueue.FIFOSQLiteQueue('src/collector/dataProcessor/database', auto_commit=True)
-        queue.put(data)
+        queue=persistqueue.FIFOSQLiteQueue('src/collector/dataProcessor/database', auto_commit=True)# accessing the queue. 
+        queue.put(data) # putting the data into the persist queue. 
     
     @threaded
     def getData(self):
         self.getDataFinished=False
         queue=persistqueue.FIFOSQLiteQueue('src/collector/dataProcessor/database', auto_commit=True)
+        # here the chunks of number of requests are sent to the database. 
         while(queue.size>0):
             data=[]
             cnt=0
@@ -54,8 +55,6 @@ class dataProcessor():
             for i in data:
                 queue.put(i)
         self.getDataFinished=True
-
-
 
 if __name__ == "__main__":
     processor=dataProcessor()
