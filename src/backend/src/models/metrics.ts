@@ -14,7 +14,7 @@ export interface ITSMetricsReq {
     to: Number;
     from: Number;
     metric: String;
-    combine_fn: String | null;
+    combine_fn?: String | null;
     aggr_fn: String | null;
     granularity: String;
     agentId: String;

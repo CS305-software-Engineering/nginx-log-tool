@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import Agents from '../../models/agents.model';
 import { e_actor, verifyToken } from '../../auth/tokens';
-import { ITSMetricsReq } from 'src/models/metrics';
+import { e_aggrFunc, ITSMetricsReq } from '../../models/metrics';
 import { granulMap } from './common';
 
 const app = express.Router();
@@ -35,7 +35,7 @@ app.post(
                     (query.from as number) + 0.1,
                     (query.to as number) + 0.1,
                 ];
-                const queryOut = await Agents.aggregate([
+                let queryParam: any = [
                     // find the agent with given agentID
                     {
                         $match: { agentId: query.agentId },
@@ -65,8 +65,10 @@ app.post(
                             'tsMetrics.metrics.name': query.metric,
                         },
                     },
-                    // bucket the new documents based on boundries calculated usign getboundries over timestamp
-                    {
+                ];
+                // bucket the new documents based on boundries calculated usign getboundries over timestamp
+                if (query.aggr_fn === e_aggrFunc.sum) {
+                    queryParam.push({
                         $bucket: {
                             groupBy: '$tsMetrics.timestamp',
                             boundaries: boundaries,
@@ -75,13 +77,28 @@ app.post(
                             },
                             default: '_unk',
                         },
-                    },
-                ]);
+                    });
+                } else if (query.aggr_fn === e_aggrFunc.avg) {
+                    queryParam.push({
+                        $bucket: {
+                            groupBy: '$tsMetrics.timestamp',
+                            boundaries: boundaries,
+                            output: {
+                                value: { $avg: '$tsMetrics.metrics.value' },
+                            },
+                            default: '_unk',
+                        },
+                    });
+                }
+                const queryOut = await Agents.aggregate(queryParam);
                 result.push({
                     from: query.from,
                     to: query.to,
                     metric: query.metric,
-                    value: queryOut[0].value,
+                    value:
+                        queryOut.length === 0
+                            ? null
+                            : Math.round(queryOut[0].value),
                     combine_fn: query.combine_fn,
                     aggr_fn: query.aggr_fn,
                     granularity: query.granularity,
@@ -90,6 +107,7 @@ app.post(
             }
             res.send({ result });
         } catch (err) {
+            console.log(err);
             res.status(500).send({ error: true, message: err.message });
         }
     }
@@ -125,7 +143,7 @@ app.post(
                     query.to as number,
                     query.from as number
                 );
-                const queryOut = await Agents.aggregate([
+                let queryParam: any = [
                     // find the agent with given agentID
                     {
                         $match: { agentId: query.agentId },
@@ -155,8 +173,10 @@ app.post(
                             'tsMetrics.metrics.name': query.metric,
                         },
                     },
-                    // bucket the new documents based on boundries calculated usign getboundries over timestamp
-                    {
+                ];
+                // bucket the new documents based on boundries calculated usign getboundries over timestamp
+                if (query.aggr_fn === e_aggrFunc.sum) {
+                    queryParam.push({
                         $bucket: {
                             groupBy: '$tsMetrics.timestamp',
                             boundaries: boundaries,
@@ -165,8 +185,20 @@ app.post(
                             },
                             default: '_unk',
                         },
-                    },
-                ]);
+                    });
+                } else if (query.aggr_fn === e_aggrFunc.avg) {
+                    queryParam.push({
+                        $bucket: {
+                            groupBy: '$tsMetrics.timestamp',
+                            boundaries: boundaries,
+                            output: {
+                                value: { $avg: '$tsMetrics.metrics.value' },
+                            },
+                            default: '_unk',
+                        },
+                    });
+                }
+                const queryOut = await Agents.aggregate(queryParam);
                 const queryOutTemp = new Map<Number, any>();
                 const queryOut_len = queryOut?.length;
                 for (let j = 1; j < boundaries.length; j++) {
@@ -175,31 +207,24 @@ app.post(
                         value: null,
                     });
                 }
-                for (let j = 1; j < queryOut_len; j++) {
-                    queryOutTemp.set(queryOut[j]?._id - 1, {
-                        _id: queryOut[j]?._id - 1,
-                        value: queryOut[j - 1]?.value,
-                    });
+                for (let j = 0; j < queryOut_len; j++) {
+                    queryOutTemp.set(
+                        boundaries[boundaries.indexOf(queryOut[j]?._id) + 1] -
+                            1,
+                        {
+                            _id:
+                                boundaries[
+                                    boundaries.indexOf(queryOut[j]?._id) + 1
+                                ] - 1,
+                            value: Math.round(queryOut[j]?.value),
+                        }
+                    );
                 }
-                // add the last timestamp value
-                queryOutTemp.set(
-                    queryOut[queryOut_len - 1]?._id -
-                        1 +
-                        granulMap.get(query.granularity)!,
-                    {
-                        _id:
-                            queryOut[queryOut_len - 1]?._id -
-                            1 +
-                            granulMap.get(query.granularity)!,
-                        value: queryOut[queryOut_len - 1]?.value,
-                    }
-                );
                 result.push({
                     from: query.from,
                     to: query.to,
                     metric: query.metric,
                     timeseries: [...queryOutTemp.values()],
-                    combine_fn: query.combine_fn,
                     aggr_fn: query.aggr_fn,
                     granularity: query.granularity,
                     agentId: query.agentId,
