@@ -175,7 +175,8 @@ function handleVisualise(agentId){
     .then(function (response) {
       // console.log(response.data);
       dispatch( saveTimeSeriesData(  response) );
-      setGraphData(response.data);
+      setGraphData( response.data);
+      
     })
     .catch(function (error) {
       console.log(error);
@@ -199,6 +200,7 @@ function getInstanceObjects(){
   .then(function (response) {
     console.log(JSON.stringify(response.data));
     dispatch(addInstance(response));
+
   })
   .catch(function (error) {
     console.log(error);
@@ -218,48 +220,48 @@ useEffect(() => {
 
 
   const interval = setInterval(() => {
-    // handleVisualise();
-    const agentId = "5505d27ea1c7f1509736b60f3d081923b12eedfc";
-    console.log('Logs every minute');
-    const starttime = timestamp.timestamp;
-    console.log("starttime" , starttime);
-    const times = 60000;
-    const data = {
-      "metrics": [
-          {
-              "from": starttime ,
-              "to": starttime+ times,
-              "metric": "httpStatus2xx",
-              "granularity": "1m",
-              "agentId": agentId
-          },
-          {
-            "from": starttime ,
-            "to": starttime + times,
-            "metric": "httpStatus4xx",
-            "granularity": "1m",
-            "agentId": agentId
-        },
-        {
-          "from": starttime,
-          "to": starttime+ times,
-          "metric": "httpStatus5xx",
-          "granularity": "1m",
-          "agentId": agentId
-      },
-      ]
-  };
+    handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
+    // const agentId = "5505d27ea1c7f1509736b60f3d081923b12eedfc";
+    // console.log('Logs every minute');
+    // const starttime = timestamp.timestamp;
+    // console.log("starttime" , starttime);
+    // const times = 60000;
+    // const data = {
+    //   "metrics": [
+    //       {
+    //           "from": starttime ,
+    //           "to": starttime+ times,
+    //           "metric": "httpStatus2xx",
+    //           "granularity": "1m",
+    //           "agentId": agentId
+    //       },
+    //       {
+    //         "from": starttime ,
+    //         "to": starttime + times,
+    //         "metric": "httpStatus4xx",
+    //         "granularity": "1m",
+    //         "agentId": agentId
+    //     },
+    //     {
+    //       "from": starttime,
+    //       "to": starttime+ times,
+    //       "metric": "httpStatus5xx",
+    //       "granularity": "1m",
+    //       "agentId": agentId
+    //   },
+    //   ]
+  // };
   
-      axiosInstance.post(`timeseries/seq` , data )
-      .then(function (response) {
-        // console.log(response.data);
-        dispatch( saveTimeSeriesData(  response) );
-        dispatch(saveTimeStamp(times))
+      // axiosInstance.post(`timeseries/seq` , data )
+      // .then(function (response) {
+      //   // console.log(response.data);
+      //   dispatch( saveTimeSeriesData(  response) );
+      //   dispatch(saveTimeStamp(times))
 
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+      // })
+      // .catch(function (error) {
+      //   console.log(error);
+      // });
   
     
 
