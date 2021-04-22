@@ -46,7 +46,7 @@ const agentSchema: Schema = new Schema({
         default: e_agentStatus.online,
     },
     meta: { type: Schema.Types.Mixed },
-    lastActive: Number,
+    lastActive: { type: Number, default: Date.now() },
     tsMetrics: [Schema.Types.Mixed],
     osStaticMetrics: Schema.Types.Mixed,
     nginxStaticMetrics: Schema.Types.Mixed,

@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { IAgent } from 'src/models/agents.model';
+import { e_agentStatus } from '../../models/agents.model';
 import { e_actor, verifyToken } from '../../auth/tokens';
 import User from '../../models/user.model';
 
@@ -27,7 +27,10 @@ app.get(
                     user.agents?.forEach((agent: any) => {
                         resData.push({
                             agentId: agent.agentId,
-                            status: agent.agentStatus,
+                            status:
+                                +new Date() - +agent.lastActive < 30000
+                                    ? e_agentStatus.online
+                                    : e_agentStatus.offline,
                             description: agent.agentDesc,
                             setting: agent.agentSetting,
                             lastActive: agent.lastActive,
