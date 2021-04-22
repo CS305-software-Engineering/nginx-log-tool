@@ -144,7 +144,9 @@ function handleVisualise(agentId){
 //  console.log(agentId)
 //  setCurrentAgent(agentId);
   const times  = 3600000;
+  const min = 1000*60; 
   const currenttime = Math.floor(Date.now());
+  console.log("ljhldsjahfhadh",currenttime);
   const data = {
     "metrics": [
         {
@@ -167,7 +169,29 @@ function handleVisualise(agentId){
         "metric": "httpStatus5xx",
         "granularity": "1m",
         "agentId": agentId
-    },
+      },
+      {
+        "from": currenttime - times,
+        "to": currenttime,
+        "metric": "getMethods",
+        "granularity": "1m",
+        "agentId": agentId
+      },
+ 
+      {
+        "from": currenttime - times,
+        "to": currenttime,
+        "metric": "protocolHttp_v0_9",
+        "granularity": "1m",
+        "agentId": agentId
+      },
+      {
+        "from": currenttime - times,
+        "to": currenttime,
+        "metric": "protocolHttp_v1_1",
+        "granularity": "1m",
+        "agentId": agentId
+      },
     ]
 };
 
@@ -390,7 +414,7 @@ function getY(l){
 
                     { timeseriesData.data != undefined ? timeseriesData.data.result.map((value) => {
                       return (
-                    <Grid item lg = {12} md={6}  xs={12}>
+                    <Grid item lg = {6} md={6}  xs={12}>
 
                       <Paper elevation={2}>
                         <LineChart  data = {value} x = {getX(value.timeseries)} y = {getY(value.timeseries)}/>
