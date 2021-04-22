@@ -58,9 +58,29 @@ export const addInstance = (p) =>{
 
 export const saveTimeSeriesData = ( p) =>{
 
+    const resultArray = p.data.result;
+    const value = {};
+    for (var i = 0 ; i< resultArray.length ; i++)
+    {
+        value[resultArray[i].metric] = resultArray[i].timeseries;
+    }
+    // console.log("save action" , value)
     return {
         type:SAVE_TIMESERIES_SEQ,
-        data:p.data
+        data: value
+    }
+}
+export const updateTimeSeriesData = (p) => {
+    const resultArray = p.data.result;
+    const value = {};
+    for (var i = 0 ; i< resultArray.length ; i++)
+    {
+        value[resultArray[i].metric] = resultArray[i].timeseries;
+    }
+    // console.log("update action" , value)
+    return {
+        type: UPDATE_TIMESERIES_SEQ,
+        data: value
     }
 }
 

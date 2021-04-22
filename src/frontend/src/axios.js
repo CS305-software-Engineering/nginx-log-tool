@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'https://nginx-log-tool.herokuapp.com/wapi/';
+const baseURL = 'http://localhost:8001/wapi/';
 
 
 const  axiosInstance = axios.create({

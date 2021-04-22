@@ -11,7 +11,7 @@ const LineChart = (props) => {
     labels:  props.x,
     datasets: [
       {
-        label: props.data.metric,
+        label: props.data,
         data: props.y,
         fill: false,
         backgroundColor: 'rgb(255, 99, 132)',
@@ -31,13 +31,13 @@ const LineChart = (props) => {
       ],
     },
   }
-  console.log(props.x)
-  console.log(props.y)
+  // console.log(props.x)
+  // console.log(props.y)
   
   return(
   <>
     <div className='header'>
-      <h1 className='title'>{props.data.metric}</h1>
+      <h1 className='title'>{props.data}</h1>
       
     </div>
     <Line data={data} options={options} />
