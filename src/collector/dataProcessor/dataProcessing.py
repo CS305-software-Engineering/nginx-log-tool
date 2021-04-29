@@ -1,7 +1,6 @@
 from pathlib import Path
 import time
 import sys
-
 sys.path.append('../')
 from collectionAgent.nginx.nginxCollectionAgent import nginxCollectionAgent
 from collectionAgent.system.systemCollectionAgent import systemCollectionAgent
@@ -11,15 +10,9 @@ from dotenv import load_dotenv
 import requests
 import persistqueue
 
-
-# print(sys.path)
-# v=Path('../')
-# print(v)
-# from utility.threads import threaded
 load_dotenv(verbose=True)
 env_path = Path('../') / '.env'
 load_dotenv(dotenv_path=env_path)
-
 
 def threaded(fn):
     def wrapper(*args, **kwargs):
@@ -37,7 +30,7 @@ class dataProcessor():
         self.maxReqSize = 1000
         self.getDataFinished = True
 
-    def addData(self):
+    def addData(self): # this is the function which is adding the data to the persist queue. 
         temp1=self.nginxCollector.setData()
         temp2=self.systemCollector.setData()
         for i in temp1:
@@ -55,7 +48,7 @@ class dataProcessor():
         }
         # accessing the queue.
         queue = persistqueue.FIFOSQLiteQueue(
-            'dataProcessor/database', auto_commit=True)
+            'dataProcessor/database', auto_commit=True) # invoking the queue. 
         queue.put(data)  # putting the data into the persist queue.
 
     @threaded
@@ -75,7 +68,7 @@ class dataProcessor():
         try:
             response = requests.post('http://nginx-log-tool.herokuapp.com/aapi/agent/dyn', json={'data':data}, headers={
                 'Authorization': 'Bearer '+os.environ.get("TOKEN")
-            })
+            }) # this is  the posting api call to the backend. 
             print(data[0])
             print(response.text)
         except:
@@ -84,7 +77,6 @@ class dataProcessor():
                 queue.put(i)
         self.getDataFinished = True
 
-
 if __name__ == "__main__":
     processor = dataProcessor()
     # Initial run
@@ -92,4 +84,4 @@ if __name__ == "__main__":
         processor.addData()
         if(processor.getDataFinished == True):
             processor.getData()
-        time.sleep(10)
+        time.sleep(60)
