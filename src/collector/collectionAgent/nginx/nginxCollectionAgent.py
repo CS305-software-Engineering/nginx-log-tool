@@ -1,4 +1,4 @@
-from os import access
+import os
 import sys
 sys.path.append('../../')
 print(sys.path)
@@ -9,47 +9,12 @@ import re
 import pickle
 from file_read_backwards import FileReadBackwards
 from datetime import datetime
+import time
+import psutil
 # these are the imports needed 
 class nginxCollectionAgent:
     """Constructor"""
     def __init__(self):
-<<<<<<< HEAD
-        self.data={} # main dictionary to add the data.  
-
-            # 'timeStamp':0.0,
-            # 'getMethods':0,
-            # 'headMethods':0,
-            # 'postMethods':0,
-            # 'putMethods':0,
-            # 'deleteMethods':0,
-            # 'optionsMethods':0,
-            # 'httpStatus1xx':0,
-            # 'httpStatus2xx':0,
-            # 'httpStatus3xx':0,
-            # 'httpStatus4xx':0,
-            # 'httpStatus5xx':0,
-            # 'httpStatus403':0,
-            # 'httpStatus404':0,
-            # 'httpStatus500,':0,
-            # 'httpStatus502':0,
-            # 'httpStatus503':0,
-            # 'httpStatus504':0,
-            # 'httpStatusDiscarded':0,
-            # 'protocolHttp_v1_0':0,
-            # 'protocolHttp_v0_9':0,
-            # 'protocolHttp_v1_1':0,
-            # 'protocolHttp_v2':0,
-        
-        self.collectorFunctions=[ 
-            self.getHttpConnectionsMetrics, # for stub status metrics
-            self.getAccessLogs # for 
-        ]  # the functions which will be used to extract data
-        self.meta={
-            'stubStatusUrl':'http://127.0.0.1/nginx_status',
-            'accessLogPath':'/var/log/nginx/access.log',
-            'storePath':'../store.pkl'
-        }# there are meta variables, used to store meta information. 
-=======
         self.data={
             'timeStamp':0.0,
             'getMethods':0,
@@ -74,32 +39,16 @@ class nginxCollectionAgent:
             'protocolHttp_v0_9':0,
             'protocolHttp_v1_1':0,
             'protocolHttp_v2':0,
-        }
->>>>>>> 14c1be31903c7b2d5be9912ce63768c629fedad3
-        latestMetrics={
-            'timeStamp':0.0,
-            'getMethods':0,
-            'headMethods':0,
-            'postMethods':0,
-            'putMethods':0,
-            'deleteMethods':0,
-            'optionsMethods':0,
-            'httpStatus1xx':0,
-            'httpStatus2xx':0,
-            'httpStatus3xx':0,
-            'httpStatus4xx':0,
-            'httpStatus5xx':0,
-            'httpStatus403':0,
-            'httpStatus404':0,
-            'httpStatus500,':0,
-            'httpStatus502':0,
-            'httpStatus503':0,
-            'httpStatus504':0,
-            'httpStatusDiscarded':0,
-            'protocolHttp_v1_0':0,
-            'protocolHttp_v0_9':0,
-            'protocolHttp_v1_1':0,
-            'protocolHttp_v2':0,
+            "connectionAccepted":0,
+            "connectionsDropped":0,
+            "activeConnections":0,
+            "currentConnections":0,
+            'idleConnections': 0, 
+            'requestCount': 0, 
+            'currentRequest': 0, 
+            'readingRequests': 0, 
+            'writingRequests':0, 
+            
         }
         self.collectorFunctions=[ 
             self.getHttpConnectionsMetrics, # for stub status metrics
@@ -110,14 +59,15 @@ class nginxCollectionAgent:
             'accessLogPath':'/var/log/nginx/access.log',
             'storePath':'../store.pkl'
         }
-        self.workers=[],
-        self.zombie_workers=[],
+        
  # this is the initial state of data that will be stored , and this is updated as we parse the logs. 
         store=open(self.meta['storePath'],'wb') # this is persistent data store, to store variables which need to be seen even after server stops. 
-        pickle.dump(latestMetrics,store) # storing the data in the store. 
+        pickle.dump(self.data,store) # storing the data in the store. 
         store.close()
+        self.zombies=[]
         
     """Get Stub Status Metrics"""
+
     @threaded
     def getHttpConnectionsMetrics(self):
         try:
@@ -139,8 +89,8 @@ class nginxCollectionAgent:
                 for metric in ['connections', 'accepts', 'handled', 'requests', 'reading', 'writing', 'waiting']:
                     httpMetrics[metric] = int(stubMatchings.group(metric))
                 
-                self.data['connectionAccepted'] = httpMetrics['accepts']-latestMetrics['connectionAccepted'] #number of connections accepted till this time.
-                self.data['connectionsDropped'] = httpMetrics['accepts']-httpMetrics['handled']-latestMetrics['connectionsDropped']# number of connections dropped till this time.
+                self.data['connectionAccepted'] = httpMetrics['accepts'] #number of connections accepted till this time.
+                self.data['connectionsDropped'] = httpMetrics['accepts']-httpMetrics['handled']# number of connections dropped till this time.
                 self.data['activeConnections'] = httpMetrics['connections']-httpMetrics['waiting']# number of active connections right now
                 self.data['currentConnections'] = httpMetrics['connections']# number of connections right now
                 self.data['idleConnections'] = httpMetrics['waiting']# number of idle connections right now 
@@ -160,6 +110,7 @@ class nginxCollectionAgent:
         accessLogsList=[]
         store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
         latestMetrics=pickle.load(store)
+        store.close()
         new_time_stamp=latestMetrics['timeStamp']
         isset=False
         with FileReadBackwards(self.meta['accessLogPath'],encoding='utf-8') as f: # reading the file backwards till the lines which are generated in the last one minute. 
@@ -235,10 +186,86 @@ class nginxCollectionAgent:
         for key in setup:
             self.data[key]=setup[key]
 
-    @threaded
+            
     def setWorkers(self):
-        os
+        store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
+        latestMetrics=pickle.load(store)
+        store.close()
+        stream=os.popen("ps xao pid,ppid,command | grep 'nginx[:]'")# command to find out the processes of nginx.
+        data=stream.read()
+        data=data.split('\n') 
+        processes=[]
+        zombies=[]
+        for line in data:
+            grp=re.match(r'\s*(?P<pid>\d+)\s+(?P<parent_pid>\d+)\s+(?P<command>.+)\s*', line)
+            if not grp:
+                continue
+            pid,parent_pid,command=int(grp.group('pid')),int(grp.group('parent_pid')),grp.group('command')
+            processes.append(psutil.Process(pid))
+            
+        """
+        memory info
 
+        nginx.workers.mem.rss
+        nginx.workers.mem.vms
+        nginx.workers.mem.rss_pct
+        """
+        rss, vms, pct = 0, 0, 0.0
+        for p in processes:
+            if p.pid in zombies:
+                continue
+            try:
+                mem_info = p.memory_info()
+                rss += mem_info.rss
+                vms += mem_info.vms
+                pct += p.memory_percent()
+            except psutil.ZombieProcess:
+                self.zombies.append(p.pid)
+
+        self.data['memory.rss']=rss
+        self.data['memory.vms']=vms
+        self.data['memory.rss_pct']=pct
+        self.data['workersCount']=len(processes)
+
+        """nginx.workers.fds_count"""
+        fds = 0
+        for p in processes:
+            if p.pid in self.zombies:
+                continue
+            try:
+                fds += p.num_fds()
+            except psutil.ZombieProcess:
+                self.handle_zombie(p.pid)
+        self.data['workers.fds_count']=fds
+
+        """
+        io
+
+        nginx.workers.io.kbs_r
+        nginx.workers.io.kbs_w
+        """
+        # collect raw data
+        read, write = 0, 0
+        for p in self.processes:
+            if p.pid in self.zombies:
+                continue
+            try:
+                io = p.io_counters()
+                read += io.read_bytes
+                write += io.write_bytes
+            except psutil.ZombieProcess:
+                self.handle_zombie(p.pid)
+
+        # kilobytes!
+        read /= 1024
+        write /= 1024
+
+        # get deltas and store metrics
+        metric_data={'io.kiloBytesRead': read, 'io.kiloBytesWritten': write}
+        for metric_name in metric_data:
+            value=metric_data[metric_name]
+            value_delta = value - latestMetrics[metric_name]
+            self.data['metric_name']= value_delta
 
     def setData(self):
         handles=[]
@@ -253,5 +280,5 @@ class nginxCollectionAgent:
         return self.data
         
 agent=nginxCollectionAgent()
-print(agent.setData())
+print(agent.setWorkers())
 

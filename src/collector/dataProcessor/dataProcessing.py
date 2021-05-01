@@ -48,17 +48,17 @@ class dataProcessor():
         }
         # accessing the queue.
         queue = persistqueue.FIFOSQLiteQueue(
-            'dataProcessor/database', auto_commit=True) # invoking the queue. 
+            './database', auto_commit=True) # invoking the queue. 
         queue.put(data)  # putting the data into the persist queue.
 
     @threaded
     def getData(self):
         self.getDataFinished = False
         queue = persistqueue.FIFOSQLiteQueue(
-            'dataProcessor/database', auto_commit=True)
+            './database', auto_commit=True)
         # here the chunks of number of requests are sent to the database.
+        data = []
         while(queue.size > 0):
-            data = []
             cnt = 0
             while(queue.size > 0 and cnt < self.maxReqSize):
                 data.append(queue.get())
