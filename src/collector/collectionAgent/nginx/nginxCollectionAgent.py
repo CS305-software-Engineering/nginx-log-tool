@@ -8,11 +8,12 @@ import random
 import re
 import pickle
 from file_read_backwards import FileReadBackwards
-from datetime import datetime 
+from datetime import datetime
 # these are the imports needed 
 class nginxCollectionAgent:
     """Constructor"""
     def __init__(self):
+<<<<<<< HEAD
         self.data={} # main dictionary to add the data.  
 
             # 'timeStamp':0.0,
@@ -48,6 +49,33 @@ class nginxCollectionAgent:
             'accessLogPath':'/var/log/nginx/access.log',
             'storePath':'../store.pkl'
         }# there are meta variables, used to store meta information. 
+=======
+        self.data={
+            'timeStamp':0.0,
+            'getMethods':0,
+            'headMethods':0,
+            'postMethods':0,
+            'putMethods':0,
+            'deleteMethods':0,
+            'optionsMethods':0,
+            'httpStatus1xx':0,
+            'httpStatus2xx':0,
+            'httpStatus3xx':0,
+            'httpStatus4xx':0,
+            'httpStatus5xx':0,
+            'httpStatus403':0,
+            'httpStatus404':0,
+            'httpStatus500,':0,
+            'httpStatus502':0,
+            'httpStatus503':0,
+            'httpStatus504':0,
+            'httpStatusDiscarded':0,
+            'protocolHttp_v1_0':0,
+            'protocolHttp_v0_9':0,
+            'protocolHttp_v1_1':0,
+            'protocolHttp_v2':0,
+        }
+>>>>>>> 14c1be31903c7b2d5be9912ce63768c629fedad3
         latestMetrics={
             'timeStamp':0.0,
             'getMethods':0,
@@ -72,7 +100,19 @@ class nginxCollectionAgent:
             'protocolHttp_v0_9':0,
             'protocolHttp_v1_1':0,
             'protocolHttp_v2':0,
-        } # this is the initial state of data that will be stored , and this is updated as we parse the logs. 
+        }
+        self.collectorFunctions=[ 
+            self.getHttpConnectionsMetrics, # for stub status metrics
+            self.getAccessLogs # for 
+        ]  # the functions which will be used to extract data
+        self.meta={
+            'stubStatusUrl':'http://127.0.0.1/nginx_status',
+            'accessLogPath':'/var/log/nginx/access.log',
+            'storePath':'../store.pkl'
+        }
+        self.workers=[],
+        self.zombie_workers=[],
+ # this is the initial state of data that will be stored , and this is updated as we parse the logs. 
         store=open(self.meta['storePath'],'wb') # this is persistent data store, to store variables which need to be seen even after server stops. 
         pickle.dump(latestMetrics,store) # storing the data in the store. 
         store.close()
@@ -83,6 +123,8 @@ class nginxCollectionAgent:
         try:
             stubData=requests.get(self.meta['stubStatusUrl'])
             try: 
+                store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
+                latestMetrics=pickle.load(store)
                 stubStatusRegex = re.compile(r'^Active connections: (?P<connections>\d+)\s+[\w ]+\n'
                         r'\s+(?P<accepts>\d+)'
                         r'\s+(?P<handled>\d+)'
@@ -97,8 +139,8 @@ class nginxCollectionAgent:
                 for metric in ['connections', 'accepts', 'handled', 'requests', 'reading', 'writing', 'waiting']:
                     httpMetrics[metric] = int(stubMatchings.group(metric))
                 
-                self.data['connectionAccepted'] = httpMetrics['accepts'] #number of connections accepted till this time.
-                self.data['connectionsDropped'] = httpMetrics['accepts']-httpMetrics['handled']# number of connections dropped till this time.
+                self.data['connectionAccepted'] = httpMetrics['accepts']-latestMetrics['connectionAccepted'] #number of connections accepted till this time.
+                self.data['connectionsDropped'] = httpMetrics['accepts']-httpMetrics['handled']-latestMetrics['connectionsDropped']# number of connections dropped till this time.
                 self.data['activeConnections'] = httpMetrics['connections']-httpMetrics['waiting']# number of active connections right now
                 self.data['currentConnections'] = httpMetrics['connections']# number of connections right now
                 self.data['idleConnections'] = httpMetrics['waiting']# number of idle connections right now 
@@ -118,8 +160,11 @@ class nginxCollectionAgent:
         accessLogsList=[]
         store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
         latestMetrics=pickle.load(store)
+        new_time_stamp=latestMetrics['timeStamp']
+        isset=False
         with FileReadBackwards(self.meta['accessLogPath'],encoding='utf-8') as f: # reading the file backwards till the lines which are generated in the last one minute. 
             for line in f:
+
                 accessLogData={}
                 for value in line.split('?'):
                     pair=value.split('*')
@@ -128,39 +173,71 @@ class nginxCollectionAgent:
 
                 #Converting time to unix timestamp format
                 timestamp=datetime.strptime(accessLogData['time_local'],'%d/%b/%Y:%H:%M:%S %z').timestamp()
-                
-                if timestamp<latestMetrics['timeStamp']: ## Reading till last read log
+                if not isset:
+                    new_time_stamp=timestamp
+                    isset=True
+                if timestamp<=latestMetrics['timeStamp']: ## Reading till last read log
                     break
                 accessLogsList.append(accessLogData)
-        self.extractMetrics(accessLogsList,latestMetrics)
+            print('Length ',len(accessLogsList))
+            print(latestMetrics['timeStamp'])
+        self.extractMetrics(accessLogsList,new_time_stamp)
+
     """Extract metrics and add to metric data object"""
-    def extractMetrics(self, accessLogList,latestMetrics):
+    def extractMetrics(self, accessLogList,timestamp):
+        setup={
+            'timeStamp':timestamp,
+            'getMethods':0,
+            'headMethods':0,
+            'postMethods':0,
+            'putMethods':0,
+            'deleteMethods':0,
+            'optionsMethods':0,
+            'httpStatus1xx':0,
+            'httpStatus2xx':0,
+            'httpStatus3xx':0,
+            'httpStatus4xx':0,
+            'httpStatus5xx':0,
+            'httpStatus403':0,
+            'httpStatus404':0,
+            'httpStatus500,':0,
+            'httpStatus502':0,
+            'httpStatus503':0,
+            'httpStatus504':0,
+            'httpStatusDiscarded':0,
+            'protocolHttp_v1_0':0,
+            'protocolHttp_v0_9':0,
+            'protocolHttp_v1_1':0,
+            'protocolHttp_v2':0,
+        }
         for logs in accessLogList:
             methodString=logs['http_method'].lower()+'Methods' #http_method count metric update
-            latestMetrics[methodString]+=1
+            # print(methodString)  
+            setup[methodString]+=1
             statusXString='httpStatus'+logs['status'][0]+'xx' # http_count metric data
-            latestMetrics[statusXString]+=1
+            setup[statusXString]+=1
             if logs['status']=='403' or logs['status']=='404' or logs['status']=='500' or logs['status']=='502' or logs['status']=='503' or logs['status']=='504':
                 statusString='httpStatus'+logs['status'] # http_Status count
-                latestMetrics[statusString]+=1
+                setup[statusString]+=1
             if logs['status']=='499':
-                latestMetrics['httpStatusDiscarded']+=1
+                setup['httpStatusDiscarded']+=1
             ########## Protocol Version
             protocolData=logs['protocol'].split('/')
             if protocolData[1]=='1.1':
-                latestMetrics['protocolHttp_v1_0']+=1
+                setup['protocolHttp_v1_0']+=1
             elif protocolData[1]=='1.0':
-                latestMetrics['protocolHttp_v0_9']+=1
+                setup['protocolHttp_v0_9']+=1
             elif protocolData[1]=='0.9':
-                latestMetrics['protocolHttp_v1_1']+=1
+                setup['protocolHttp_v1_1']+=1
             elif protocolData[1]=='2':
-                latestMetrics['protocolHttp_v2']+=1
-        for key in latestMetrics:
-            self.data[key]=latestMetrics[key]
-    
-    # @threaded
-    # def getNginxWorkersMetrics(self):
+                setup['protocolHttp_v2']+=1
+            
+        for key in setup:
+            self.data[key]=setup[key]
 
+    @threaded
+    def setWorkers(self):
+        os
 
 
     def setData(self):
@@ -170,8 +247,10 @@ class nginxCollectionAgent:
         for thread in handles:
             thread.join()## joining all the threads to wait for completion
         print('threads completed')
+        store=open(self.meta['storePath'],'wb') # this is persistent data store, to store variables which need to be seen even after server stops. 
+        pickle.dump(self.data,store) # storing the latest data in the store. 
+        store.close()
         return self.data
-
         
 agent=nginxCollectionAgent()
 print(agent.setData())
