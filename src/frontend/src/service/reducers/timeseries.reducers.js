@@ -4,22 +4,24 @@ import {SAVE_TIME, SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ} from '../constan
 
 const data = {}
 
-export default function timeseriesReducer(state=data, action){
 
-    switch(action.type) {
+              
+export default function timeseriesReducer(state = data, action) {
+    // console.log('state: ', state);
+    // console.log('actiondata: ', action.data)
+    switch (action.type) {
         case SAVE_TIMESERIES_SEQ:
-            return {
-                ...state,
-                data: action.data,
-            }
-        
-        // case UPDATE_TIMESERIES_SEQ:
-        //     data: [...state , ]
-
+            let tempState = { ...state };
+            Object.entries(action.data).map(([key, value]) => {
+                if (key in state) {
+                    tempState[key] = tempState[key]?.concat(value);
+                } else {
+                    tempState[key] = value;
+              
+}
+            });
+            return tempState;
         default:
-            return state
-
-
-
+            return state;
     }
 }
