@@ -182,7 +182,7 @@ export default function PrimarySearchAppBar() {
             <MenuIcon />
           </IconButton> */}
 
-          <Typography className={classes.title} variant="h6" noWrap>
+          <Typography  className={classes.title} variant="h6" noWrap>
             NGINX-LOG-TOOL
           </Typography>
          
@@ -196,7 +196,7 @@ export default function PrimarySearchAppBar() {
           <Button component={Link} to='/analytics' color="inherit" style={{marginLeft:20 }} variant="outlined">
           Analytics
           </Button>
-          <Button component={Link} to='/alerts' color="inherit" style={{marginLeft:20 }} variant="outlined">
+           <Button component={Link} to='/alerts' color="inherit" style={{marginLeft:20 }} variant="outlined">
           Alerts
           </Button>
         

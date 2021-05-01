@@ -21,16 +21,17 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
-
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { addInstance, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
+import { addInstance, resetTimeSeries, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
 
 import AddInstanceDialog from './createInstanceDialog';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
 
@@ -123,8 +124,10 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function Analytics() {
-  const MINUTE_MS = 30000;
-
+  var MINUTE_MS = 60000;
+  var check = false;
+  // const [MINUTE_MS ,setMinute] = useState(60000);
+  const [granularity , setGran] = useState("1m");
   const classes = useStyles();
   const dispatch = useDispatch();
   const [currAgent, setCurrentAgent] = useState(null);
@@ -137,16 +140,39 @@ export default function Analytics() {
   const [graphInit, setGraphInit] = React.useState(false);
   const [graphData, setGraphData] = React.useState([]);
   const [currTime,setCurrTime]=React.useState(Date.now());
+  const [startDate , setStartDate] = useState('');
+  const [endDate , setEndDate] = useState('');
+
+  const startDateHandler=(e) =>{
+    setStartDate(e.target.value) ;
+  }
+  const endDateHandler=(e) =>{
+    setEndDate(e.target.value) ;
+  }
+
+
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  function handleGran(a , b){
+    setGran(a);
+    MINUTE_MS = b;
+    // setGraphInit(false);
+    setCurrTime(Date.now());
+    check = false;
+    dispatch(resetTimeSeries());
+    // handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc")
+
+  }
+
   function handleVisualise(agentId) {
 
     //  console.log(agentId)
     //  setCurrentAgent(agentId);
-    const times = graphInit==false?3600000:60000;
+    const times = check==false?3600000:MINUTE_MS;
     // const a = graphInit == false?10000:0;
-    const min = 1000 * 60;
     // console.log("ljhldsjahfhadh", currTime);
     const ngmetrics = [
       "getMethods",
@@ -191,8 +217,9 @@ export default function Analytics() {
           "from": currTime - times,
           "to": currTime,
           "metric": ngmetrics[i],
-          "granularity": "30s",
-          "agentId": agentId
+          "granularity": granularity,
+          "agentId": agentId,
+          "aggr_fn": "sum"
         }
       );
     }
@@ -215,6 +242,8 @@ export default function Analytics() {
           console.log(error);
         });
         setGraphInit(true);
+        check = true;
+
         setCurrTime(currTime + MINUTE_MS);
     console.log('graph is set',graphInit);
   }
@@ -246,59 +275,15 @@ export default function Analytics() {
     getInstanceObjects();
   }, [])
 
-
+  useEffect(() => {
+    handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
+  }, [granularity])
 
   useEffect(() => {
 
-
     const interval = setInterval(() => {
       handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
-      // const agentId = "5505d27ea1c7f1509736b60f3d081923b12eedfc";
-      // console.log('Logs every minute');
-      // const starttime = timestamp.timestamp;
-      // console.log("starttime" , starttime);
-      // const times = 60000;
-      // const data = {
-      //   "metrics": [
-      //       {
-      //           "from": starttime ,
-      //           "to": starttime+ times,
-      //           "metric": "httpStatus2xx",
-      //           "granularity": "1m",
-      //           "agentId": agentId
-      //       },
-      //       {
-      //         "from": starttime ,
-      //         "to": starttime + times,
-      //         "metric": "httpStatus4xx",
-      //         "granularity": "1m",
-      //         "agentId": agentId
-      //     },
-      //     {
-      //       "from": starttime,
-      //       "to": starttime+ times,
-      //       "metric": "httpStatus5xx",
-      //       "granularity": "1m",
-      //       "agentId": agentId
-      //   },
-      //   ]
-      // };
-    
-      // axiosInstance.post(`timeseries/seq` , data )
-      // .then(function (response) {
-      //   // console.log(response.data);
-      //   dispatch( saveTimeSeriesData(  response) );
-      //   dispatch(saveTimeStamp(times))
-
-      // })
-      // .catch(function (error) {
-      //   console.log(error);
-      // });
-
-
-
-
-    }, MINUTE_MS);
+    }, 60000);
 
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   }, [currTime])
@@ -394,8 +379,6 @@ export default function Analytics() {
               })
                 : null}
             </List>
-
-
           </Grid>
           <Grid item  >
             <Divider orientation="vertical" ></Divider>
@@ -418,8 +401,52 @@ export default function Analytics() {
               </TabPanel>
               <TabPanel value={value} index={0}>
                 <h1 className='title' style={{ textAlign: "center" }}>NGINX Metrics</h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
 
+                  <div>
+
+                  <TextField
+                    autoFocus
+                    margin="dense"
+                  
+                    id="startDate"
+                    label="Start Date"
+                    type="date"
+                    fullWidth
+                    variant="outlined"      
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange ={startDateHandler}
+                  />
+
+            <TextField
+                    autoFocus
+                    margin="dense"
+                  
+                    id="endDate"
+                    label="End Date"
+                    type="date"
+                    fullWidth
+                    variant="outlined"      
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    onChange ={endDateHandler}
+
+                  />
+                  </div>
                 <Grid container spacing={1}>
+
+            
+ 
+
                   {
                     
                     Object.entries(timeseriesData).map(function([key , value]) {
@@ -428,6 +455,7 @@ export default function Analytics() {
                         <Grid item lg={6} md={6} xs={12}>
   
                           <Paper elevation={2}>
+              
                             <LineChart data={key} x={getX(value)} y={getY(value)} />
                           </Paper>
                         </Grid>

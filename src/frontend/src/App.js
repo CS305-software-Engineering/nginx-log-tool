@@ -6,7 +6,6 @@ import Analytics from './main/Analytics/analytics';
 import Alerts from './main/Alerts/alert';
 import { useHistory } from "react-router-dom";
 
-
 import {useSelector , useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { authCheck, saveTimeStamp } from './service/actions/user.actions';
