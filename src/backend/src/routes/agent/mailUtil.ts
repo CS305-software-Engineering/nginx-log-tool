@@ -16,10 +16,10 @@ transporter.use(
     'compile',
     hbs({
         viewEngine: {
-            partialsDir: '../../views/',
+            partialsDir: './src/views/',
             defaultLayout: '',
         },
-        viewPath: '../../views/',
+        viewPath: './src/views/',
     })
 );
 

@@ -32,7 +32,7 @@ export const userSchema: Schema = new Schema({
     max_agents: { type: Number, default: 5 },
     max_alerts: { type: Number, default: 5 },
     timewindow: { type: String, enum: e_timewindow, default: e_timewindow.h_1 },
-    agents: [{ type: Schema.Types.ObjectId, ref: 'Agents' }],
+    agents: [{ type: Schema.Types.ObjectId, ref: 'agents' }],
     alerts: [{ type: Schema.Types.ObjectId, ref: 'alerts' }],
     notifics: [{ type: Schema.Types.ObjectId, ref: 'notifications' }],
 });

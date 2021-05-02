@@ -148,10 +148,15 @@ app.get(
     async (req: Request, res: Response) => {
         try {
             if (!req.query.id) {
-                const alerts = await Alert.find({});
+                const alerts = await User.findOne({
+                    email: res.locals.payload.email,
+                }).populate('alerts');
                 res.send({ alerts: alerts });
             } else {
-                const alerts = await Alert.findOne({ _id: req.query.id });
+                const alerts = await User.findOne({
+                    email: res.locals.payload.email,
+                    'alerts._id': req.query.id,
+                }).populate('alerts');
                 res.send({ alerts: alerts });
             }
         } catch (err) {

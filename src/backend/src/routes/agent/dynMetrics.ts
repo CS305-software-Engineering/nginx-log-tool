@@ -138,7 +138,7 @@ app.post(
                                     },
                                 },
                             ]);
-                            console.log(checkAlert[0]);
+                            
                             if (!checkAlert[0]?.sum_val) {
                                 continue;
                             } else {
@@ -156,9 +156,19 @@ app.post(
                                     date_created: curr_time,
                                     agent_id: res.locals.payload.agentId,
                                 });
-                                await newNotification.save();
-                                user.notifics?.push(newNotification._id);
-                                await user.save();
+                                newNotification.save(async (err) => {
+                                    if (err) {
+                                        throw new Error(err.message);
+                                    } else {
+                                        user.notifics?.push(
+                                            newNotification._id
+                                        );
+                                        user.save();
+                                    }
+                                    // await newNotification.save();
+                                    // user.notifics?.push(newNotification._id);
+                                    // await user.save();
+                                });
                             }
                         }
                     }
