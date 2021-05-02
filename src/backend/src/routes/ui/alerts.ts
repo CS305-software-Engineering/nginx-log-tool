@@ -69,7 +69,9 @@ app.post(
                         }
                         user.alerts?.push(newAlert._id);
                         await user.save();
-                        res.send({ message: 'Successfully added new alert' });
+                        res.status(201).send({
+                            message: 'Successfully added new alert',
+                        });
                     });
                 }
             }
@@ -122,12 +124,12 @@ app.delete(
                 // remove the reference alert from the user document also
                 await User.updateOne(
                     { email: res.locals.payload.email },
-                    { $pull: { alerts: { _id: req.params.id } } }
+                    { $pull: { alerts: req.params.id } }
                 );
             } else {
                 throw new Error('Error deleting alert!');
             }
-            res.send({ message: 'alert removed successfully' });
+            res.status(201).send({ message: 'alert removed successfully' });
         } catch (err) {
             res.status(500).send({ error: true, message: err.message });
         }

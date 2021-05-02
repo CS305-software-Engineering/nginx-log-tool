@@ -14,6 +14,7 @@ import timewindow from './routes/ui/timewindow';
 import timeseries from './routes/ui/timeseries';
 import user from './routes/ui/user';
 import alerts from './routes/ui/alerts';
+import notify from './routes/ui/notify';
 
 dotenv.config();
 const app = express();
@@ -54,6 +55,7 @@ app.use('/wapi/tw', timewindow);
 app.use('/wapi/timeseries', timeseries);
 app.use('/wapi/user', user);
 app.use('/wapi/alerts', alerts);
+app.use('/wapi/notify', notify);
 
 // agent routes
 app.use('/aapi/agent', agent);

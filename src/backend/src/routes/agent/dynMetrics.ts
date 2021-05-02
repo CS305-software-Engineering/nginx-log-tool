@@ -5,6 +5,7 @@ import { alert_period, IAlert } from '../../models/alerts.model';
 import User from '../../models/user.model';
 import ITSMetric, { IMetricDesc } from '../../models/metrics';
 import Notify from '../../models/notify.model';
+import { sendNotifyMail } from './mailUtil';
 
 const app = express.Router();
 
@@ -19,7 +20,10 @@ const formatNotificMessage = (userAlert: any, value: Number) => {
         status =
             value === userAlert.threshold ? 'equal to' : 'no longer equal to';
     }
-    return `Metric ${userAlert.metric_name} is ${status} the threshold of ${userAlert.threshold}.\nLast checked value was ${value} over the past ${userAlert.period}`;
+    const message = `Metric ${userAlert.metric_name} is ${status} the threshold of ${userAlert.threshold}.\n Last checked value was ${value} over the past ${userAlert.period}`;
+    // send a mail to the user
+    sendNotifyMail(userAlert.contact, userAlert.agentId, message);
+    return message;
 };
 
 /**
@@ -134,6 +138,7 @@ app.post(
                                     },
                                 },
                             ]);
+                            console.log(checkAlert[0]);
                             if (!checkAlert[0]?.sum_val) {
                                 continue;
                             } else {

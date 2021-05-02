@@ -11,15 +11,16 @@ export const alert_period: { [id: string]: Number } = {
     '24hr': 86400000,
 };
 
-export const threshOp: {[id:string]: string} = {
-    "<": "below",
-    ">": "not below",
-    "=": "equal to"
-}
+export const threshOp: { [id: string]: string } = {
+    '<': 'below',
+    '>': 'not below',
+    '=': 'equal to',
+};
 
 export interface IAlert extends Document {
     user: String;
     metric_name: String;
+    source: String;
     contact: String;
     operator?: String;
     threshold?: Number;
@@ -33,6 +34,7 @@ export interface IAlert extends Document {
 const alertSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'Users' },
     metric_name: { type: String, required: true },
+    source: { type: String, required: true },
     contact: { type: String, required: true },
     operator: String,
     threshold: String,

@@ -1,13 +1,12 @@
 import express, { Request, Response } from 'express';
-import User from '../../models/user.model';
-import Alert from '../../models/alerts.model';
+import User, { IUser } from '../../models/user.model';
 import { e_actor, verifyToken } from '../../auth/tokens';
-import Notify from 'src/models/notify.model';
+import Notify from '../../models/notify.model';
 
 const app = express.Router();
 
 /**
- * @route           POST /notify/all?query
+ * @route           GET /notify/all?query
  * @description     get all the notifications of the authenticated user based on params
  * @access          Private
  */
@@ -16,10 +15,10 @@ app.get(
     verifyToken(e_actor.user),
     async (_req: Request, res: Response) => {
         try {
-            const notifics = await User.findOne({
+            const notifics: IUser = (await User.findOne({
                 email: res.locals.payload.email,
-            }).populate('notifications');
-            res.send({ notifics });
+            }).populate('notifications')) as IUser;
+            res.send({ notifications: notifics.notifics });
         } catch (err) {
             res.status(500).send({ error: true, message: err.message });
         }
@@ -32,15 +31,40 @@ app.get(
  * @access          Private
  */
 app.put(
-    '/read/:id',
+    '/read',
     verifyToken(e_actor.user),
     async (req: Request, res: Response) => {
         try {
-            await Notify.updateOne(
-                { _id: req.params.id },
-                { read: Date.now() }
-            );
+            await Notify.updateOne({ _id: req.body.id }, { read: Date.now() });
             res.status(201);
+        } catch (err) {
+            res.status(500).send({ error: true, message: err.message });
+        }
+    }
+);
+
+/**
+ * @route           POST /notify/remove/:id
+ * @description     delete a notification from the backend.
+ * @access          Private
+ */
+app.delete(
+    '/remove/:id',
+    verifyToken(e_actor.user),
+    async (req: Request, res: Response) => {
+        try {
+            const deleteRes = await Notify.deleteOne({ _id: req.params.id });
+            if (deleteRes.deletedCount === 1) {
+                // remove the reference alert from the user document also
+                await User.updateOne(
+                    { email: res.locals.payload.email },
+                    { $pull: { notifics: req.params.id } }
+                );
+            } else {
+                throw new Error('Error deleting notification!');
+            }
+            res.send({ message: 'Notification removed successfully' });
+            res.status(201).send();
         } catch (err) {
             res.status(500).send({ error: true, message: err.message });
         }
