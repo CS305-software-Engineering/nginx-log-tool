@@ -3,15 +3,13 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import DraftsIcon from '@material-ui/icons/Drafts';
-import SendIcon from '@material-ui/icons/Send';
+
 import { Alert, AlertTitle } from '@material-ui/lab';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import { useSelector } from 'react-redux';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -56,12 +54,17 @@ const StyledMenuItem = withStyles((theme) => ({
 
 export default function NotificationButton() {
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const data = useSelector(state => state.notificationData)
+
+
   const classes = useStyles();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
+  console.log("THis is Notifications" , data);
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -103,6 +106,22 @@ export default function NotificationButton() {
         }
       >
         This is a success alert — check it out!
+      </Alert>
+      <Alert variant = "outlined" severity="error">
+        <AlertTitle>Error</AlertTitle>
+        This is an error alert — <strong>check it out!</strong>
+      </Alert>
+      <Alert variant = "outlined" severity="warning">
+        <AlertTitle>Warning</AlertTitle>
+        This is a warning alert — <strong>check it out!</strong>
+      </Alert>
+      <Alert variant = "outlined" severity="info">
+        <AlertTitle>Info</AlertTitle>
+        This is an info alert — <strong>check it out!</strong>
+      </Alert>
+      <Alert variant = "outlined" severity="success">
+        <AlertTitle>Success</AlertTitle>
+        This is a success alert — <strong>check it out!</strong>
       </Alert>
       </Menu>
     </div>

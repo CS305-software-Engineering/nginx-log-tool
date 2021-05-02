@@ -8,7 +8,8 @@ import { useHistory } from "react-router-dom";
 
 import {useSelector , useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { authCheck, saveTimeStamp } from './service/actions/user.actions';
+import { addInstance , authCheck, saveNotification, saveTimeStamp } from './service/actions/user.actions';
+import axiosInstance from './axios';
 
 
 
@@ -22,6 +23,28 @@ function App() {
     dispatch(saveTimeStamp(Math.floor(Date.now())));
   }, [])
  
+
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+   
+      axiosInstance.get('notify/all')
+      .then(function (response) {
+        console.log("Notification",JSON.stringify(response.data));
+        dispatch(saveNotification(response.data.notifications));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    }, 60000);
+
+    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  }, [])
+
+
+
+
 
   console.log(user)
   return (

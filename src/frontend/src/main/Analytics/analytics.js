@@ -24,7 +24,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { addInstance, resetTimeSeries, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
+import { addInstance, resetTimeSeries, saveAgent, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
 
 import AddInstanceDialog from './createInstanceDialog';
 import AppBar from '@material-ui/core/AppBar';
@@ -130,10 +130,13 @@ export default function Analytics() {
   const [granularity , setGran] = useState("1m");
   const classes = useStyles();
   const dispatch = useDispatch();
-  const [currAgent, setCurrentAgent] = useState(null);
   const instanceArray = useSelector(state => state.instanceData)
   const timeseriesData = useSelector(state => state.timeseriesData)
   const timestamp = useSelector(state => state.timestamp);
+
+  const currAgent = useSelector(state => state.myagent);
+
+
   // console.log("tHIS IS AGENT DETAILS", instanceArray);
   // console.log("timestamp", timestamp);
   const [value, setValue] = React.useState(0);
@@ -142,6 +145,9 @@ export default function Analytics() {
   const [currTime,setCurrTime]=React.useState(Date.now());
   const [startDate , setStartDate] = useState('');
   const [endDate , setEndDate] = useState('');
+
+  var latestAgent="";
+
 
   const startDateHandler=(e) =>{
     setStartDate(e.target.value) ;
@@ -159,7 +165,7 @@ export default function Analytics() {
   function handleGran(a , b){
     setGran(a);
     MINUTE_MS = b;
-    // setGraphInit(false);
+    setGraphInit(false);
     setCurrTime(Date.now());
     check = false;
     dispatch(resetTimeSeries());
@@ -167,11 +173,16 @@ export default function Analytics() {
 
   }
 
+ function handleAgentClicked(agentId){
+
+    dispatch(saveAgent(agentId));
+  }
+
   function handleVisualise(agentId) {
 
-    //  console.log(agentId)
-    //  setCurrentAgent(agentId);
-    const times = check==false?3600000:MINUTE_MS;
+
+     console.log(currAgent)
+    const times = graphInit==false?3600000:MINUTE_MS;
     // const a = graphInit == false?10000:0;
     // console.log("ljhldsjahfhadh", currTime);
     const ngmetrics = [
@@ -227,6 +238,7 @@ export default function Analytics() {
     const data  ={
       "metrics":x
     }
+    console.log(data)
     axiosInstance.post(`timeseries/seq`, data)
         .then(function (response) {
           // console.log("ojhjodahvhfsabxxxxxxxxxx",response.data);
@@ -262,6 +274,7 @@ export default function Analytics() {
       .then(function (response) {
         // console.log(JSON.stringify(response.data));
         dispatch(addInstance(response));
+        // setCurrentAgent(response.)
 
       })
       .catch(function (error) {
@@ -275,21 +288,22 @@ export default function Analytics() {
     getInstanceObjects();
   }, [])
 
-  useEffect(() => {
-    handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
-  }, [granularity])
+  // useEffect(() => {
+    
+  //   handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
+  // }, [granularity])
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    const interval = setInterval(() => {
-      handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
-    }, 60000);
+  //   const interval = setInterval(() => {
+  //     handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
+  //   }, 60000);
 
-    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  }, [currTime])
+  //   return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  // }, [currTime])
 
 
-  console.log("timeseries data", timeseriesData);
+  // console.log("timeseries data", timeseriesData);
 
   function getX(l) {
 
@@ -409,7 +423,7 @@ export default function Analytics() {
                         <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
                   </ButtonGroup>
 
-                  <div>
+                  {/* <div>
 
                   <TextField
                     autoFocus
@@ -441,7 +455,7 @@ export default function Analytics() {
                     onChange ={endDateHandler}
 
                   />
-                  </div>
+                  </div> */}
                 <Grid container spacing={1}>
 
             
