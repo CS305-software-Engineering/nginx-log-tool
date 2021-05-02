@@ -186,85 +186,85 @@ class nginxCollectionAgent:
         for key in setup:
             self.data[key]=setup[key]
             
-    def setWorkers(self):
-        store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
-        latestMetrics=pickle.load(store)
-        store.close()
-        stream=os.popen("ps xao pid,ppid,command | grep 'nginx[:]'")# command to find out the processes of nginx.
-        data=stream.read()
-        data=data.split('\n')
-        processes=[]
-        zombies=[]
-        for line in data:
-            grp=re.match(r'\s*(?P<pid>\d+)\s+(?P<parent_pid>\d+)\s+(?P<command>.+)\s*', line)
-            if not grp:
-                continue
-            pid,parent_pid,command=int(grp.group('pid')),int(grp.group('parent_pid')),grp.group('command')
-            processes.append(psutil.Process(pid))
+    # def setWorkers(self):
+    #     store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
+    #     latestMetrics=pickle.load(store)
+    #     store.close()
+    #     stream=os.popen("ps xao pid,ppid,command | grep 'nginx[:]'")# command to find out the processes of nginx.
+    #     data=stream.read()
+    #     data=data.split('\n') 
+    #     processes=[]
+    #     zombies=[]
+    #     for line in data:
+    #         grp=re.match(r'\s*(?P<pid>\d+)\s+(?P<parent_pid>\d+)\s+(?P<command>.+)\s*', line)
+    #         if not grp:
+    #             continue
+    #         pid,parent_pid,command=int(grp.group('pid')),int(grp.group('parent_pid')),grp.group('command')
+    #         processes.append(psutil.Process(pid))
             
-        """
-        memory info
+    #     """
+    #     memory info
 
-        nginx.workers.mem.rss
-        nginx.workers.mem.vms
-        nginx.workers.mem.rss_pct
-        """
-        rss, vms, pct = 0, 0, 0.0
-        for p in processes:
-            if p.pid in zombies:
-                continue
-            try:
-                mem_info = p.memory_info()
-                rss += mem_info.rss
-                vms += mem_info.vms
-                pct += p.memory_percent()
-            except psutil.ZombieProcess:
-                self.zombies.append(p.pid)
+    #     nginx.workers.mem.rss
+    #     nginx.workers.mem.vms
+    #     nginx.workers.mem.rss_pct
+    #     """
+    #     rss, vms, pct = 0, 0, 0.0
+    #     for p in processes:
+    #         if p.pid in zombies:
+    #             continue
+    #         try:
+    #             mem_info = p.memory_info()
+    #             rss += mem_info.rss
+    #             vms += mem_info.vms
+    #             pct += p.memory_percent()
+    #         except psutil.ZombieProcess:
+    #             self.zombies.append(p.pid)
 
-        self.data['memory.rss']=rss
-        self.data['memory.vms']=vms
-        self.data['memory.rss_pct']=pct
-        self.data['workersCount']=len(processes)
+    #     self.data['memory.rss']=rss
+    #     self.data['memory.vms']=vms
+    #     self.data['memory.rss_pct']=pct
+    #     self.data['workersCount']=len(processes)
 
-        """nginx.workers.fds_count"""
-        # fds = 0
-        # for p in processes:
-        #     if p.pid in self.zombies:
-        #         continue
-        #     try:
-        #         #fds += p.num_fds()
-        #     except psutil.ZombieProcess:
-        #         self.handle_zombie(p.pid)
-        # self.data['workers.fds_count']=fds
+    #     """nginx.workers.fds_count"""
+    #     fds = 0
+    #     for p in processes:
+    #         if p.pid in self.zombies:
+    #             continue
+    #         try:
+    #             fds += p.num_fds()
+    #         except psutil.ZombieProcess:
+    #             self.handle_zombie(p.pid)
+    #     self.data['workers.fds_count']=fds
 
-        """
-        io
+    #     """
+    #     io
 
-        nginx.workers.io.kbs_r
-        nginx.workers.io.kbs_w
-        """
-        #collect raw data
-        read, write = 0, 0
-        for p in processes:
-            if p.pid in self.zombies:
-                continue
-            try:
-                io = p.io_counters()
-                read += io.read_bytes
-                write += io.write_bytes
-            except psutil.ZombieProcess:
-                self.handle_zombie(p.pid)
+    #     nginx.workers.io.kbs_r
+    #     nginx.workers.io.kbs_w
+    #     """
+    #     # collect raw data
+    #     read, write = 0, 0
+    #     for p in self.processes:
+    #         if p.pid in self.zombies:
+    #             continue
+    #         try:
+    #             io = p.io_counters()
+    #             read += io.read_bytes
+    #             write += io.write_bytes
+    #         except psutil.ZombieProcess:
+    #             self.handle_zombie(p.pid)
 
-        # kilobytes!
-        read /= 1024
-        write /= 1024
+    #     # kilobytes!
+    #     read /= 1024
+    #     write /= 1024
 
-        # get deltas and store metrics
-        metric_data={'io.kiloBytesRead': read, 'io.kiloBytesWritten': write}
-        for metric_name in metric_data:
-            value=metric_data[metric_name]
-            value_delta = value - latestMetrics[metric_name]
-            self.data['metric_name']= value_delta
+    #     # get deltas and store metrics
+    #     metric_data={'io.kiloBytesRead': read, 'io.kiloBytesWritten': write}
+    #     for metric_name in metric_data:
+    #         value=metric_data[metric_name]
+    #         value_delta = value - latestMetrics[metric_name]
+    #         self.data['metric_name']= value_delta
 
     def setData(self):
         handles=[]
@@ -280,5 +280,5 @@ class nginxCollectionAgent:
 
 
 agent=nginxCollectionAgent()
-print(agent.setWorkers())
+# print(agent.setWorkers())
 

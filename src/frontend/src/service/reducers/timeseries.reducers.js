@@ -1,6 +1,6 @@
      
      
-import {SAVE_TIME, SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ} from '../constants';
+import {SAVE_TIME, SAVE_TIMESERIES_SEQ , CLEAR_TIMESERIES,UPDATE_TIMESERIES_SEQ} from '../constants';
 
 const data = {}
 
@@ -18,9 +18,13 @@ export default function timeseriesReducer(state = data, action) {
                 } else {
                     tempState[key] = value;
               
-}
+                }
             });
             return tempState;
+        
+        case CLEAR_TIMESERIES:
+            return {}
+        
         default:
             return state;
     }

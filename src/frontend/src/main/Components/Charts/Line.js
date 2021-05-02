@@ -14,7 +14,7 @@ const LineChart = (props) => {
         label: props.data,
         data: props.y,
         fill: false,
-        backgroundColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgb(255, 0, 132)',
         borderColor: 'rgba(255, 99, 132, 0.2)',
       },
     ],

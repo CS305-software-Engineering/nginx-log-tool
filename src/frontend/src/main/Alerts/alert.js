@@ -4,6 +4,9 @@ import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import { Alert, AlertTitle } from '@material-ui/lab';
 
+import SetAlertForm from './setAlertForm';
+
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -21,6 +24,7 @@ export default function Alerts() {
          <NavBar></NavBar>
         <br></br>
     <Container className={classes.root}>
+      <SetAlertForm />
       <Alert variant = "outlined" severity="error">
         <AlertTitle>Error</AlertTitle>
         This is an error alert — <strong>check it out!</strong>

@@ -20,7 +20,6 @@ export interface ITSMetricsReq {
     agentId: String;
 }
 
-// TODO update the types of all the different metrics
 export interface IMetricDesc {
     source?: String;
     name: String;

@@ -1,4 +1,4 @@
-import {SAVE_TIME, SAVE_USER , LOGOUT_USER ,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE , SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ} from '../constants';
+import {SAVE_TIME, SAVE_USER , LOGOUT_USER ,CLEAR_TIMESERIES,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE , SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ} from '../constants';
 
 import {axios} from 'axios';
 
@@ -97,3 +97,10 @@ export const saveTimeStamp = (x)  =>{
         data:x
     }
 }
+
+export const resetTimeSeries =() =>{
+    return {
+        type:CLEAR_TIMESERIES
+    }
+}
+

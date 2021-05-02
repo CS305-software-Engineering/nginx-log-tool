@@ -29,6 +29,7 @@ app.get(
                         api_key: user.api_key,
                         max_agents: user.max_agents,
                         curr_agents_num: user.agents?.length,
+                        curr_alerts_num: user.alerts?.length,
                     },
                 });
             }
