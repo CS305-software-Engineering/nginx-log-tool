@@ -51,6 +51,7 @@ class dataProcessor():
             './database', auto_commit=True) # invoking the queue. 
         queue.put(data)  # putting the data into the persist queue.
 
+    
     @threaded
     def getData(self):
         self.getDataFinished = False
@@ -77,6 +78,7 @@ class dataProcessor():
                 queue.put(i)
         self.getDataFinished = True
 
+
 if __name__ == "__main__":
     processor = dataProcessor()
     # Initial run
@@ -85,3 +87,4 @@ if __name__ == "__main__":
         if(processor.getDataFinished == True):
             processor.getData()
         time.sleep(60)
+

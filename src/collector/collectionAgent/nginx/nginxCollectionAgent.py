@@ -46,7 +46,7 @@ class nginxCollectionAgent:
             'idleConnections': 0, 
             'requestCount': 0, 
             'currentRequest': 0, 
-            'readingRequests': 0, 
+      t      'readingRequests': 0, 
             'writingRequests':0, 
             
         }
@@ -185,7 +185,6 @@ class nginxCollectionAgent:
             
         for key in setup:
             self.data[key]=setup[key]
-
             
     def setWorkers(self):
         store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
@@ -193,7 +192,7 @@ class nginxCollectionAgent:
         store.close()
         stream=os.popen("ps xao pid,ppid,command | grep 'nginx[:]'")# command to find out the processes of nginx.
         data=stream.read()
-        data=data.split('\n') 
+        data=data.split('\n')
         processes=[]
         zombies=[]
         for line in data:
@@ -228,15 +227,15 @@ class nginxCollectionAgent:
         self.data['workersCount']=len(processes)
 
         """nginx.workers.fds_count"""
-        fds = 0
-        for p in processes:
-            if p.pid in self.zombies:
-                continue
-            try:
-                fds += p.num_fds()
-            except psutil.ZombieProcess:
-                self.handle_zombie(p.pid)
-        self.data['workers.fds_count']=fds
+        # fds = 0
+        # for p in processes:
+        #     if p.pid in self.zombies:
+        #         continue
+        #     try:
+        #         #fds += p.num_fds()
+        #     except psutil.ZombieProcess:
+        #         self.handle_zombie(p.pid)
+        # self.data['workers.fds_count']=fds
 
         """
         io
@@ -244,9 +243,9 @@ class nginxCollectionAgent:
         nginx.workers.io.kbs_r
         nginx.workers.io.kbs_w
         """
-        # collect raw data
+        #collect raw data
         read, write = 0, 0
-        for p in self.processes:
+        for p in processes:
             if p.pid in self.zombies:
                 continue
             try:
@@ -278,7 +277,8 @@ class nginxCollectionAgent:
         pickle.dump(self.data,store) # storing the latest data in the store. 
         store.close()
         return self.data
-        
+
+
 agent=nginxCollectionAgent()
 print(agent.setWorkers())
 
