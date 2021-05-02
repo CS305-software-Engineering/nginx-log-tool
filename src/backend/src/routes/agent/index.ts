@@ -56,9 +56,10 @@ app.post('/init', async (req: Request, res: Response) => {
                     await agent.save(async (err: any) => {
                         if (err) {
                             throw new Error(err.message);
+                        } else {
+                            user.agents?.push(agent._id);
+                            await user.save();
                         }
-                        user.agents?.push(agent._id);
-                        await user.save();
                     });
                 }
                 // token for every subsequent request by the agent

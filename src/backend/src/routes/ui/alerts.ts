@@ -66,12 +66,13 @@ app.post(
                     newAlert.save(async (err: any) => {
                         if (err) {
                             throw new Error(err.message);
+                        } else {
+                            user.alerts?.push(newAlert._id);
+                            await user.save();
+                            res.status(201).send({
+                                message: 'Successfully added new alert',
+                            });
                         }
-                        user.alerts?.push(newAlert._id);
-                        await user.save();
-                        res.status(201).send({
-                            message: 'Successfully added new alert',
-                        });
                     });
                 }
             }

@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import User, { IUser } from '../../models/user.model';
+import User from '../../models/user.model';
 import { e_actor, verifyToken } from '../../auth/tokens';
 import Notify from '../../models/notify.model';
 
@@ -15,10 +15,10 @@ app.get(
     verifyToken(e_actor.user),
     async (_req: Request, res: Response) => {
         try {
-            const notifics: IUser = (await User.findOne({
+            const notifics = await User.findOne({
                 email: res.locals.payload.email,
-            }).populate('notifications')) as IUser;
-            res.send({ notifications: notifics.notifics });
+            }).populate('notifications');
+            res.send({ notifications: notifics?.notifics });
         } catch (err) {
             res.status(500).send({ error: true, message: err.message });
         }
