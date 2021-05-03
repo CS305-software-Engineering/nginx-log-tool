@@ -5,6 +5,7 @@ import timeseriesReducer from './timeseries.reducers';
 import timestampReducer from './timestamp.reducer';
 import notificationReducer from './notification.reducer';
 import agentReducer from './agent.reducer';
+import graphReducer from './graph.reducer';
 
 const appReducer =  combineReducers({
     userData: userReducer,
@@ -13,6 +14,7 @@ const appReducer =  combineReducers({
     timestamp:timestampReducer,
     notificationData:notificationReducer,
     myagent: agentReducer,
+    graphInit:graphReducer,
 })
 
 export default appReducer;

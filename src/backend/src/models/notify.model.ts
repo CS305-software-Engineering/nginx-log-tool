@@ -16,4 +16,4 @@ const notifySchema = new Schema({
     agent_id: { type: String, required: true },
 });
 
-export default mongoose.model<INotify>('notifications', notifySchema);
+export default mongoose.model<INotify>('notifications', notifySchema, 'notifications');

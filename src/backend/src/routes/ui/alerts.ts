@@ -151,13 +151,13 @@ app.get(
                 const alerts = await User.findOne({
                     email: res.locals.payload.email,
                 }).populate('alerts');
-                res.send({ alerts: alerts });
+                res.send({ alerts: alerts?.alerts });
             } else {
                 const alerts = await User.findOne({
                     email: res.locals.payload.email,
                     'alerts._id': req.query.id,
                 }).populate('alerts');
-                res.send({ alerts: alerts });
+                res.send({ alerts: alerts?.alerts });
             }
         } catch (err) {
             res.status(500).send({ error: true, message: err.message });

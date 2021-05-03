@@ -1,12 +1,12 @@
      
      
-import {SAVE_TIME} from '../constants';
+import {SAVE_GRAPHINIT} from '../constants';
 
 
-export default function timestampReducer(state=Date.now(), action){
+export default function graphReducer(state=false, action){
 
     switch(action.type) {
-        case SAVE_TIME:
+        case SAVE_GRAPHINIT:
             return action.data
         
         // case UPDATE_TIMESERIES_SEQ:

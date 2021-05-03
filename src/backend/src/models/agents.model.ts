@@ -52,4 +52,4 @@ const agentSchema: Schema = new Schema({
     nginxStaticMetrics: Schema.Types.Mixed,
 });
 
-export default mongoose.model<IAgent>('Agents', agentSchema);
+export default mongoose.model<IAgent>('agents', agentSchema, 'agents');

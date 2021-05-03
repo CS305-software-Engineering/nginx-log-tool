@@ -43,4 +43,4 @@ const alertSchema = new Schema({
     date_created: { type: Number, default: Date.now(), required: true },
 });
 
-export default mongoose.model<IAlert>('alerts', alertSchema);
+export default mongoose.model<IAlert>('alerts', alertSchema, 'alerts');

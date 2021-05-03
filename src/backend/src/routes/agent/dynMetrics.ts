@@ -160,14 +160,11 @@ app.post(
                                     if (err) {
                                         throw new Error(err.message);
                                     } else {
-                                        user.notifics?.push(
+                                        user.notifications?.push(
                                             newNotification._id
                                         );
                                         user.save();
                                     }
-                                    // await newNotification.save();
-                                    // user.notifics?.push(newNotification._id);
-                                    // await user.save();
                                 });
                             }
                         }
