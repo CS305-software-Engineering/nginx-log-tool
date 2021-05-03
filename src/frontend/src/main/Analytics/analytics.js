@@ -36,7 +36,6 @@ import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
 
-// sample agent id 5505d27ea1c7f1509736b60f3d081923b12eedfc
 
 
 function TabPanel(props) {
@@ -141,7 +140,6 @@ export default function Analytics() {
   const instanceArray = useSelector(state => state.instanceData)
   const timeseriesData = useSelector(state => state.timeseriesData)
   const timestamp = useSelector(state => state.timestamp);
-
   // const currAgent = useSelector(state => state.myagent);
   const [currAgent,setCurrentAgent] = useState(null);
 
@@ -154,7 +152,6 @@ export default function Analytics() {
   const [startDate , setStartDate] = useState('');
   const [endDate , setEndDate] = useState('');
 
-  var latestAgent="";
 
 
   const startDateHandler=(e) =>{
@@ -183,7 +180,11 @@ export default function Analytics() {
  function handleAgentClicked(agentId){
 
     // dispatch(saveAgent(agentId));
-    setCurrentAgent(agentId , handleVisualise() );
+    setCurrentAgent(agentId  );
+    setGraphInit(false);
+
+    dispatch(resetTimeSeries());
+
 
     // if(currAgent !=null)
     //   {
@@ -193,9 +194,9 @@ export default function Analytics() {
 
   }
 
-  function handleVisualise(agentId) {
+  function handleVisualise(currAgent) {
     
-     setCurrentAgent(agentId);
+    // setCurrentAgent(agentId);
     if(currAgent != null){
 
      console.log(currAgent)
@@ -204,6 +205,7 @@ export default function Analytics() {
     // console.log("ljhldsjahfhadh", currTime);
 
     const ngmetrics = [
+      "cpuPercent",
       "getMethods",
       "headMethods",
       "postMethods",
@@ -338,21 +340,8 @@ export default function Analytics() {
   
   }, [currTime])
 
-  // function autoDataFetch(){
 
-  //   alert("auto data fetch started");
-  //   const interval = setInterval(() => {
-  //     handleVisualise();
-  //   }, 60000);
-
-  //   return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  
-
-
-  // }
-
-
-  // console.log("timeseries data", timeseriesData);
+  console.log("timeseries data", timeseriesData);
 
   function getX(l) {
 
@@ -390,20 +379,8 @@ export default function Analytics() {
       <div className={classes.root}>
         <Grid container >
 
-          <Grid item xs={2} >
-            <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <SearchIcon />
-              </div>
-              <InputBase
-                placeholder="Search…"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }}
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </div>
+          <Grid item xs={3} >
+
 
             <Grid>
               <Grid item>
@@ -422,7 +399,8 @@ export default function Analytics() {
 
               {instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
                 return (
-                  <ListItem button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
+                  <div>
+                  <ListItem style={{backgroundColor: value.agentId == currAgent? "green" : "orange"}} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
                     <ListItemAvatar>
                       <Avatar>
                         <FolderIcon />
@@ -431,27 +409,24 @@ export default function Analytics() {
                     <ListItemText
                       primary={`${value.description.host} ${value.description.uid} `}
                     />
-                    <ListItemSecondaryAction>
 
-                      {/* <IconButton edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton> */}
-                    </ListItemSecondaryAction>
                   </ListItem>
+                  <Divider />
+                  </div>
                 );
               })
-                : null}
+                : <p>No agents present</p>}
             </List>
           </Grid>
           <Grid item  >
             <Divider orientation="vertical" ></Divider>
           </Grid>
 
-          <Grid item xs={9} >
+          <Grid item xs={8} >
 
             <Container >
               <br></br>
-              <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
+              {/* <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
                 <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
                   <Tab label="Nginx Metrics" {...a11yProps(1)} />
                   <Tab label="System Metrics" {...a11yProps(0)} />
@@ -461,50 +436,6 @@ export default function Analytics() {
               <TabPanel value={value} index={1}>
                 <h1 className='title' style={{ textAlign: "center" }}>System Metrics</h1>
 
-              </TabPanel>
-              <TabPanel value={value} index={0}>
-                <h1 className='title' style={{ textAlign: "center" }}>NGINX Metrics</h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
-
-                  {/* <div>
-
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                  
-                    id="startDate"
-                    label="Start Date"
-                    type="date"
-                    fullWidth
-                    variant="outlined"      
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange ={startDateHandler}
-                  />
-
-            <TextField
-                    autoFocus
-                    margin="dense"
-                  
-                    id="endDate"
-                    label="End Date"
-                    type="date"
-                    fullWidth
-                    variant="outlined"      
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange ={endDateHandler}
-
-                  />
-                  </div> */}
                 <Grid container spacing={1}>
 
             
@@ -513,7 +444,45 @@ export default function Analytics() {
                   {
                     Object.entries(timeseriesData).length > 0 ?
                     Object.entries(timeseriesData).map(function([key , value]) {
-                      console.log(key, value);
+                      // console.log(key, value);
+                      return (
+                        <Grid item lg={6} md={6} xs={12}>
+  
+                          <Paper elevation={2}>
+              
+                            <LineChart data={key} x={getX(value)} y={getY(value)} />
+                          </Paper>
+                        </Grid>
+                      );
+                     })
+                     :
+                     <CircularProgress  className={ classes.progress}/>
+
+
+                  }
+                  </Grid>
+
+              </TabPanel> */}
+
+              {/* <TabPanel value={value} index={0}> */}
+                <h1 className='title' style={{ textAlign: "center" }}>OS and NGINX Metrics </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+
+                <Grid container spacing={1}>
+
+            
+ 
+
+                  {
+                    Object.entries(timeseriesData).length > 0 ?
+                    Object.entries(timeseriesData).map(function([key , value]) {
+                      // console.log(key, value);
                       return (
                         <Grid item lg={6} md={6} xs={12}>
   
@@ -533,7 +502,7 @@ export default function Analytics() {
                   
 
                 </Grid>
-              </TabPanel>
+              {/* </TabPanel> */}
 
             </Container>
 

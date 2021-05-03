@@ -74,7 +74,7 @@ export default function Alerts() {
         <br></br>
     <Container className={classes.root}>
       {instanceArray.instanceData != undefined ?
-      <SetAlertForm _id="" f={0} metric="" contact="" operator="" period="" th="" agentId = { instanceArray.instanceData[0].agentId}/>
+      <SetAlertForm _id="" f={0} metric="" contact="" operator="" period="" th=""   agentId = { instanceArray.instanceData[0].agentId}/>
       :null}
       
       
