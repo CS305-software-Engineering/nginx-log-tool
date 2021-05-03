@@ -74,7 +74,7 @@ class dataProcessor():
         # API call
         try:
             print(data)
-            response = requests.post('http://nginx-log-tool.herokuapp.com/aapi/agent/dyn', json={'data':data}, headers={
+            response = requests.post('https://software-engineering-308707.el.r.appspot.com/aapi/agent/dyn', json={'data':data}, headers={
                 'Authorization': 'Bearer '+os.environ.get("TOKEN")
             }) # this is  the posting api call to the backend. 
             logger.log("Successfully sent the data")
@@ -87,7 +87,7 @@ class dataProcessor():
 
 def main():
     if os.geteuid() != 0:
-        os.execvp('sudo', ['sudo', '../../../../venv/bin/python'] + sys.argv)
+        os.execvp('sudo', ['sudo', '/opt/venvs/collector/bin/activate/python'] + sys.argv)
     else:
         processor = dataProcessor()
         # Initial run
@@ -95,5 +95,5 @@ def main():
             processor.addData()
             if(processor.getDataFinished == True):
                 processor.getData()
-            time.sleep(5)
+            time.sleep(60)
 main()
