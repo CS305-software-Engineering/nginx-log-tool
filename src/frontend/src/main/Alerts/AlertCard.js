@@ -43,6 +43,8 @@ export default function AlertCard(props) {
     axiosInstance.delete(`alerts/remove/${props.value._id}`).then(function(response){
         console.log(response.data)
         alert(response.data.message);
+        props.setF(!props.flag)
+
     })
     .catch(function (error) {
         console.log(error);
@@ -62,7 +64,7 @@ export default function AlertCard(props) {
 
         </CardContent>
         <CardActions>
-            <SetAlertForm _id={props.value._id} f= {1} metric={props.value.metric_name} contact={props.value.contact} operator={props.value.operator} period={props.value.period} th={props.value.threshold} agentId = {props.value.agentId}/>
+            <SetAlertForm _id={props.value._id} f= {1} metric={props.value.metric_name} contact={props.value.contact} operator={props.value.operator} period={props.value.period} th={props.value.threshold} agentList = {props.agentList}/>
 
             <Button onClick= {handleDelete} variant="outlined"  style={{color:"red"}}>Delete</Button>
             

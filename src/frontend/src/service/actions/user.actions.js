@@ -1,4 +1,4 @@
-import {SAVE_AGENT,SAVE_TIME, SAVE_USER ,SAVE_NOTIFICATION, LOGOUT_USER ,CLEAR_TIMESERIES,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE , SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ, SAVE_GRAPHINIT} from '../constants';
+import {SAVE_OS,SAVE_NGINX,SAVE_AGENT,SAVE_TIME, SAVE_USER ,SAVE_NOTIFICATION, LOGOUT_USER ,CLEAR_TIMESERIES,AUTH_CHECK , ADD_INSTANCE , REMOVE_INSTANCE , SAVE_TIMESERIES_SEQ , UPDATE_TIMESERIES_SEQ, SAVE_GRAPHINIT} from '../constants';
 
 import {axios} from 'axios';
 
@@ -120,6 +120,20 @@ export const saveAgent =(x) =>{
 export const saveGraphInit =(x) =>{
     return {
         type:SAVE_GRAPHINIT,
+        data:x
+    }
+}
+
+export const saveOsMetrics = (x) =>{
+    return {
+        type:SAVE_OS,
+        data:x
+    }
+
+}    
+export const saveNginxMetrics = (x) =>{
+    return {
+        type:SAVE_NGINX,
         data:x
     }
 }

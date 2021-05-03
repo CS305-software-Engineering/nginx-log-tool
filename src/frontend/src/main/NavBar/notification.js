@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import axiosInstance from '../../axios';
 import { saveNotification } from '../../service/actions/user.actions';
+import { Divider } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -66,7 +67,7 @@ export default function NotificationButton() {
     fetchNotifications();
   };
 
-  // console.log("THis is Notifications" , data.notification.notifications);
+  // console.log("THis is Notifications" , data);
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -74,7 +75,6 @@ export default function NotificationButton() {
   function fetchNotifications(){
     axiosInstance.get('notify/all')
       .then(function (response) {
-        console.log("Notification",JSON.stringify(response.data));
         dispatch(saveNotification(response.data.notifications));
       })
       .catch(function (error) {
@@ -101,17 +101,9 @@ export default function NotificationButton() {
 
   return (
     <div>
-      {/* <Button
-        aria-controls="customized-menu"
-        aria-haspopup="true"
-        variant="contained"
-        color="primary"
-        onClick={handleClick}
-      >
-        Open Menu
-      </Button> */}
+      
       <IconButton   onClick={handleClick} aria-label="" color="inherit">
-        <Badge badgeContent={data.notification != undefined ?data.notification.notifications.length: 0} color="secondary">
+        <Badge badgeContent={ data.length} color="secondary">
         <NotificationsIcon />
         </Badge>
       </IconButton>
@@ -123,30 +115,18 @@ export default function NotificationButton() {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-       {data.notification != undefined ? data.notification.notifications.map((value) =>{
+       {data != undefined ? data.map((value) =>{
          return(
-        <Alert onClose={()=>handleDeleteNotification(value._id)} variant = "outlined" severity="info">
+           <div>
+        <Alert onClose={()=>handleDeleteNotification(value._id)}  severity="warning">
           <AlertTitle>{value.agent_id}</AlertTitle>
           {value.message}
         </Alert>
+        <Divider/>
+        </div>
          );
        }) : <Alert >No new Notifications</Alert>}
-      {/* <Alert variant = "outlined" severity="error">
-        <AlertTitle>Error</AlertTitle>
-        This is an error alert — <strong>check it out!</strong>
-      </Alert>
-      <Alert variant = "outlined" severity="warning">
-        <AlertTitle>Warning</AlertTitle>
-        This is a warning alert — <strong>check it out!</strong>
-      </Alert>
-      <Alert variant = "outlined" severity="info">
-        <AlertTitle>Info</AlertTitle>
-        This is an info alert — <strong>check it out!</strong>
-      </Alert>
-      <Alert variant = "outlined" severity="success">
-        <AlertTitle>Success</AlertTitle>
-        This is a success alert — <strong>check it out!</strong>
-      </Alert> */}
+     
       </Menu>
     </div>
   );

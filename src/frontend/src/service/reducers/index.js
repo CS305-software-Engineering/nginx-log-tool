@@ -6,6 +6,8 @@ import timestampReducer from './timestamp.reducer';
 import notificationReducer from './notification.reducer';
 import agentReducer from './agent.reducer';
 import graphReducer from './graph.reducer';
+import osReducer from './osmetric.reducer';
+import nginxReducer from './nginxmetric.reducer';
 
 const appReducer =  combineReducers({
     userData: userReducer,
@@ -15,6 +17,8 @@ const appReducer =  combineReducers({
     notificationData:notificationReducer,
     myagent: agentReducer,
     graphInit:graphReducer,
+    osMetric:osReducer,
+    nginxMetric:nginxReducer,
 })
 
 export default appReducer;

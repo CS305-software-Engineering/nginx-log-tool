@@ -109,7 +109,7 @@ export default function PrimarySearchAppBar() {
    
       axiosInstance.get('notify/all')
       .then(function (response) {
-        console.log("Notification",JSON.stringify(response.data));
+        // console.log("Notification",JSON.stringify(response.data));
         dispatch(saveNotification(response.data.notifications));
       })
       .catch(function (error) {

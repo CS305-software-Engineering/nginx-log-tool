@@ -33,7 +33,7 @@ export default function Alerts() {
 
   const classes = useStyles();
   const instanceArray = useSelector(state => state.instanceData)
-
+  const [flag , setF] = useState("a");
   const [alerts , setAlerts] = useState([]);
   const dispatch = useDispatch();
 
@@ -64,7 +64,7 @@ export default function Alerts() {
 
   useEffect(() => {
     getInstanceObjects();
-  }, [])
+  }, [flag])
 
 
   console.log("This is alerts ",alerts);
@@ -74,13 +74,13 @@ export default function Alerts() {
         <br></br>
     <Container className={classes.root}>
       {instanceArray.instanceData != undefined ?
-      <SetAlertForm _id="" f={0} metric="" contact="" operator="" period="" th=""   agentId = { instanceArray.instanceData[0].agentId}/>
+      <SetAlertForm flag={flag} setF={setF.bind(this)} _id="" f={0} metric="" contact="" operator="" period="" th=""   agentList = { instanceArray.instanceData }/>
       :null}
       
       
       {alerts != undefined ? alerts.map((value) => {
                 return (
-                  <AlertCard  value = {value} />
+                  <AlertCard flag={flag} setF={setF.bind(this)} agentList = { instanceArray.instanceData }  value = {value} />
                 );
               })
                 : 

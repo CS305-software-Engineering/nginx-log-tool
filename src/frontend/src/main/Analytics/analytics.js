@@ -25,7 +25,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { addInstance, resetTimeSeries, saveAgent, saveGraphInit, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
+import { addInstance, resetTimeSeries, saveAgent, saveGraphInit, saveNginxMetrics, saveOsMetrics, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
 
 import AddInstanceDialog from './createInstanceDialog';
 import AppBar from '@material-ui/core/AppBar';
@@ -143,10 +143,17 @@ export default function Analytics() {
   const currAgent = useSelector(state => state.myagent);
   // const [currAgent,setCurrentAgent] = useState(null);
   const [graphData, setGraphData] = React.useState([]);
+  const nginx = useSelector(state=>state.nginxMetric);
+  const os = useSelector(state=>state.osMetric);
 
-  // console.log("tHIS IS AGENT DETAILS", instanceArray);
-  // console.log("timestamp", timestamp);
-  // const [graphInit, setGraphInit] = React.useState(false);
+  const [value , setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+ console.log(os);
+ console.log(nginx);
 
   const graphInit = useSelector(state=> state.graphInit);
   // const [currTime,setCurrTime]=React.useState(Date.now());
@@ -192,7 +199,7 @@ export default function Analytics() {
     // const a = graphInit == false?10000:0;
     // console.log("ljhldsjahfhadh", currTime);
 
-    const ngmetrics = [
+   const ngmetrics = [
       "cpuPercent",
       "getMethods",
       "headMethods",
@@ -293,8 +300,23 @@ export default function Analytics() {
     // setInterval(100000);
   }
 
+  function fetchMetrics() {
+    if(currAgent != null){
+      // alert(currAgent);
+    axiosInstance.get(`metrics/${currAgent}?static=0&dyn=1`).then(function(response){
+      console.log("kijkphfgiahira",response.data)
+      dispatch(saveOsMetrics(response.data.metrics.os));
+      dispatch(saveNginxMetrics(response.data.metrics.nginx));
+
+    }).catch(function(error){
+      console.log(error)
+    });
+  }
+}
+
   useEffect(() => {
     getInstanceObjects();
+    // fetchMetrics()
   }, [])
 
   useEffect(() => {
@@ -307,6 +329,8 @@ export default function Analytics() {
   useEffect(() => {
     if(currAgent != null){
     handleVisualise(currAgent);
+    fetchMetrics()
+
     }
   }, [currAgent])
 
@@ -327,7 +351,7 @@ export default function Analytics() {
   }, [currTime])
 
 
-  console.log("timeseries data", timeseriesData);
+  // console.log("timeseries data", timeseriesData);
 
   function getX(l) {
 
@@ -393,7 +417,7 @@ export default function Analytics() {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={`${value.description.host} ${value.description.uid} `}
+                      primary={`${value.description.host}-${value.description.uid}`}
                     />
 
                   </ListItem>
@@ -412,7 +436,7 @@ export default function Analytics() {
 
             <Container >
               <br></br>
-              {/* <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
+              <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
                 <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
                   <Tab label="Nginx Metrics" {...a11yProps(1)} />
                   <Tab label="System Metrics" {...a11yProps(0)} />
@@ -422,36 +446,6 @@ export default function Analytics() {
               <TabPanel value={value} index={1}>
                 <h1 className='title' style={{ textAlign: "center" }}>System Metrics</h1>
 
-                <Grid container spacing={1}>
-
-            
- 
-
-                  {
-                    Object.entries(timeseriesData).length > 0 ?
-                    Object.entries(timeseriesData).map(function([key , value]) {
-                      // console.log(key, value);
-                      return (
-                        <Grid item lg={6} md={6} xs={12}>
-  
-                          <Paper elevation={2}>
-              
-                            <LineChart data={key} x={getX(value)} y={getY(value)} />
-                          </Paper>
-                        </Grid>
-                      );
-                     })
-                     :
-                     <CircularProgress  className={ classes.progress}/>
-
-
-                  }
-                  </Grid>
-
-              </TabPanel> */}
-
-              {/* <TabPanel value={value} index={0}> */}
-                <h1 className='title' style={{ textAlign: "center" }}>OS and NGINX Metrics </h1>
                 <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
                         <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
                         <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
@@ -469,6 +463,8 @@ export default function Analytics() {
                     Object.entries(timeseriesData).length > 0 ?
                     Object.entries(timeseriesData).map(function([key , value]) {
                       // console.log(key, value);
+                      if(os.length>0 && os.includes(key)){
+
                       return (
                         <Grid item lg={6} md={6} xs={12}>
   
@@ -478,7 +474,46 @@ export default function Analytics() {
                           </Paper>
                         </Grid>
                       );
-                     })
+                     }})
+                     :
+                     <CircularProgress  className={ classes.progress}/>
+
+
+                  }
+                  </Grid>
+
+              </TabPanel>
+
+              <TabPanel value={value} index={0}>
+                <h1 className='title' style={{ textAlign: "center" }}>NGINX Metrics </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+
+                <Grid container spacing={1}>
+
+            
+ 
+
+                  {
+                    Object.entries(timeseriesData).length > 0 ?
+                    Object.entries(timeseriesData).map(function([key , value]) {
+                      // console.log(key, value);
+                     if(nginx.length>0 && nginx.includes(key)){
+                      return (
+                        <Grid item lg={6} md={6} xs={12}>
+  
+                          <Paper elevation={2}>
+              
+                            <LineChart data={key} x={getX(value)} y={getY(value)} />
+                          </Paper>
+                        </Grid>
+                      );
+                     }})
                      :
                      <CircularProgress  className={ classes.progress}/>
 
@@ -488,7 +523,7 @@ export default function Analytics() {
                   
 
                 </Grid>
-              {/* </TabPanel> */}
+              </TabPanel>
 
             </Container>
 

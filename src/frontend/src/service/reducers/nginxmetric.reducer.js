@@ -1,18 +1,17 @@
      
      
-import {SAVE_NOTIFICATION} from '../constants';
+import {SAVE_NGINX} from '../constants';
 
-const data = []
 
 
               
-export default function notificationReducer(state = data, action) {
+export default function nginxReducer(state = [], action) {
     // console.log('state: ', state);
     // console.log('actiondata: ', action.data)
     switch (action.type) {
-        case SAVE_NOTIFICATION:
-            return action.data
-        
+        case SAVE_NGINX:
+            return action.data;
+            
 
 
         

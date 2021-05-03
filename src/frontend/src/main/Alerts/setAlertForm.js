@@ -26,7 +26,7 @@ export default function SetAlertForm(props) {
   const [comp , setComp] = React.useState(props.operator);
   const [email , setEmail] = useState(props.contact);
   const [time , setTime] = useState(props.period);
-
+  const [agentName , setAgentName] = useState('');
 
   const ngmetrics = [
     "getMethods",
@@ -93,6 +93,10 @@ export default function SetAlertForm(props) {
     setTime(e.target.value);
 }  
 
+const agentNameChange=(e) =>{
+   setAgentName(e.target.value);
+}
+
   const handleAddAlert = () => {
     const data ={
       "metric_name":metric,
@@ -100,13 +104,16 @@ export default function SetAlertForm(props) {
       "operator":comp,
       "period":time,
       "threshold":threshold,
-      "agentId":props.agentId
+      "agentId":agentName
 
     }
     console.log(data)
     axiosInstance.post(`alerts/add`, data)
     .then(function (response) {
       console.log(response.data);
+      alert(response.data.message);
+      handleClose();
+      props.setF("c")
     })
     .catch(function (error) {
       console.log(error);
@@ -123,13 +130,17 @@ export default function SetAlertForm(props) {
       "operator":comp,
       "period":time,
       "threshold":threshold,
-      "agentId":props.agentId
+      "agentId": agentName
 
     }
 
 
     axiosInstance.put(`alerts/update/${props._id}` , data).then(function(response){
             console.log(response)       
+            alert(response.data.message);
+            handleClose();
+            props.setF("b")
+
     })
     .catch(function (error) {
         console.log(error);
@@ -237,6 +248,25 @@ export default function SetAlertForm(props) {
             style = {{marginTop:10}}
 
           />
+           <TextField
+                    id="agent"
+                    select
+                    label="Please select Agent"
+                    fullWidth
+                    variant="outlined"
+
+                    onChange={agentNameChange}
+                    value={agentName}
+                    style = {{marginTop:10}}
+                  >
+                  {props.agentList==undefined?<em>none</em>:
+                    props.agentList.map((value) => (
+                      <MenuItem value={`${value.description.host}-${value.description.uid}`} >
+                      <em>{`${value.description.host}-${value.description.uid}`}</em>
+                      </MenuItem>
+                    ))
+                  }
+         </TextField>
 
         </DialogContent>
         <DialogActions>
