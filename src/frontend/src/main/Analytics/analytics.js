@@ -25,7 +25,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { addInstance, resetTimeSeries, saveAgent, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
+import { addInstance, resetTimeSeries, saveAgent, saveGraphInit, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
 
 import AddInstanceDialog from './createInstanceDialog';
 import AppBar from '@material-ui/core/AppBar';
@@ -75,7 +75,7 @@ function a11yProps(index) {
 const useStyles = makeStyles((theme) => ({
 
   progress: {
-     marginLeft:300,
+     marginLeft:600,
      marginTop:300,
   }
     ,
@@ -139,39 +139,25 @@ export default function Analytics() {
   const dispatch = useDispatch();
   const instanceArray = useSelector(state => state.instanceData)
   const timeseriesData = useSelector(state => state.timeseriesData)
-  const timestamp = useSelector(state => state.timestamp);
-  // const currAgent = useSelector(state => state.myagent);
-  const [currAgent,setCurrentAgent] = useState(null);
+  const currTime = useSelector(state => state.timestamp);
+  const currAgent = useSelector(state => state.myagent);
+  // const [currAgent,setCurrentAgent] = useState(null);
+  const [graphData, setGraphData] = React.useState([]);
 
   // console.log("tHIS IS AGENT DETAILS", instanceArray);
   // console.log("timestamp", timestamp);
-  const [value, setValue] = React.useState(0);
-  const [graphInit, setGraphInit] = React.useState(false);
-  const [graphData, setGraphData] = React.useState([]);
-  const [currTime,setCurrTime]=React.useState(Date.now());
-  const [startDate , setStartDate] = useState('');
-  const [endDate , setEndDate] = useState('');
+  // const [graphInit, setGraphInit] = React.useState(false);
 
-
-
-  const startDateHandler=(e) =>{
-    setStartDate(e.target.value) ;
-  }
-  const endDateHandler=(e) =>{
-    setEndDate(e.target.value) ;
-  }
-
-
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const graphInit = useSelector(state=> state.graphInit);
+  // const [currTime,setCurrTime]=React.useState(Date.now());
 
   function handleGran(a , b){
     setGran(a);
     MINUTE_MS = b;
-    setGraphInit(false);
-    setCurrTime(Date.now());
+    // setGraphInit(false);
+    dispatch(saveGraphInit(false));
+    // setCurrTime(Date.now());
+    dispatch(saveTimeStamp(Date.now()))
     check = false;
     dispatch(resetTimeSeries());
 
@@ -179,9 +165,11 @@ export default function Analytics() {
 
  function handleAgentClicked(agentId){
 
-    // dispatch(saveAgent(agentId));
-    setCurrentAgent(agentId  );
-    setGraphInit(false);
+    dispatch(saveAgent(agentId));
+    // setCurrentAgent(agentId  );
+    // setGraphInit(false);
+    dispatch(saveGraphInit(false));
+
 
     dispatch(resetTimeSeries());
 
@@ -273,21 +261,19 @@ export default function Analytics() {
         .catch(function (error) {
           console.log(error);
         });
-        setGraphInit(true);
+        // setGraphInit(true);
+        dispatch(saveGraphInit(true));
+
         check = true;
 
-        setCurrTime(currTime + MINUTE_MS);
+        // setCurrTime(currTime + MINUTE_MS);
+        dispatch(saveTimeStamp(currTime + MINUTE_MS));
     console.log('graph is set',graphInit);
 
       }
 
   }
 
-  function xAxisChanger(data, newData) {
-    data.shift();
-    data.push(newData);
-    return data;
-  }
 
 
   function getInstanceObjects() {
