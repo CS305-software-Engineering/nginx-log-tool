@@ -100,7 +100,7 @@ app.put(
                     operator: req.body.operator,
                     period: req.body.period,
                     threshold: req.body.threshold,
-                    threshold_unit: req.body.threshold_unit,
+                    agentId: req.body.agentId,
                 }
             );
             res.status(201).send({ message: 'updated Alert Successfully' });

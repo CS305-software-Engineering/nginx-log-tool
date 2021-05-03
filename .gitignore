@@ -27,5 +27,8 @@ __pycache__
 .db
 .pkl
 .env
+.gcloudignore
+app.yaml
+DockerFile
 .vscode/settings.json
 venv
