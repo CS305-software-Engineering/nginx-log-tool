@@ -1,7 +1,7 @@
 from pathlib import Path
 import time
 import sys
-sys.path.append('../')
+sys.path.insert(0,'../')
 from collectionAgent.nginx.nginxCollectionAgent import nginxCollectionAgent
 from collectionAgent.system.systemCollectionAgent import systemCollectionAgent
 import threading
@@ -9,6 +9,7 @@ import os
 from dotenv import load_dotenv
 import requests
 import persistqueue
+from utility.logger import logger
 
 load_dotenv(verbose=True)
 env_path = Path('../') / '.env'
@@ -31,7 +32,11 @@ class dataProcessor():
         self.getDataFinished = True
 
     def addData(self): # this is the function which is adding the data to the persist queue. 
-        temp1=self.nginxCollector.setData()
+        nginxStatus=os.popen('systemctl is-active nginx').read()
+        temp1={}
+        temp2={}
+        if(nginxStatus.strip()=="active"):
+            temp1=self.nginxCollector.setData()
         temp2=self.systemCollector.setData()
         for i in temp1:
             temp1[i]={
@@ -41,17 +46,19 @@ class dataProcessor():
             temp2[j]={
                 'value':temp2[j]
             }
+        
+
         data = {
                 'timestamp': time.time()*1000,
                 'nginxDynamicMetrics': temp1,
                 'osDynamicMetrics': temp2
         }
-        # accessing the queue.
+        
+            # accessing the queue.
         queue = persistqueue.FIFOSQLiteQueue(
             './database', auto_commit=True) # invoking the queue. 
-        queue.put(data)  # putting the data into the persist queue.
-
-    
+        queue.put(data)  # putting the data into the persist queue
+       
     @threaded
     def getData(self):
         self.getDataFinished = False
@@ -64,27 +71,29 @@ class dataProcessor():
             while(queue.size > 0 and cnt < self.maxReqSize):
                 data.append(queue.get())
                 cnt += 1
-
         # API call
         try:
+            print(data)
             response = requests.post('http://nginx-log-tool.herokuapp.com/aapi/agent/dyn', json={'data':data}, headers={
                 'Authorization': 'Bearer '+os.environ.get("TOKEN")
             }) # this is  the posting api call to the backend. 
-            print(data[0])
-            print(response.text)
+            logger.log("Successfully sent the data")
+
         except:
-            print('request failed')
+            logger.log("There was an api error, request failed")
             for i in data:
                 queue.put(i)
         self.getDataFinished = True
 
-
-if __name__ == "__main__":
-    processor = dataProcessor()
-    # Initial run
-    while(1):
-        processor.addData()
-        if(processor.getDataFinished == True):
-            processor.getData()
-        time.sleep(60)
-
+def main():
+    if os.geteuid() != 0:
+        os.execvp('sudo', ['sudo', '../../../../venv/bin/python'] + sys.argv)
+    else:
+        processor = dataProcessor()
+        # Initial run
+        while(1):
+            processor.addData()
+            if(processor.getDataFinished == True):
+                processor.getData()
+            time.sleep(5)
+main()

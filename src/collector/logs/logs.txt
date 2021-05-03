@@ -1,0 +1,8 @@
+2021-05-04 00:47:45.272758 : nginx.conf set successfully!!
+2021-05-04 00:50:36.061454 : No data in store, service started for the first time.
+2021-05-04 00:50:39.402865 : Successfully sent the data
+2021-05-04 00:50:45.581702 : Successfully sent the data
+2021-05-04 00:50:51.907626 : Successfully sent the data
+2021-05-04 00:50:58.587367 : Successfully sent the data
+2021-05-04 00:51:04.683876 : Successfully sent the data
+2021-05-04 00:51:10.763639 : Successfully sent the data
