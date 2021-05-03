@@ -7,6 +7,7 @@ import axiosInstance from '../../axios';
 import { useEffect } from 'react';
 import NavBar from '../NavBar';
 import { Divider, Button, Container, Grid, Paper, IconButton } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import LineChart from '../Components/Charts/Line';
 import SyncIcon from '@material-ui/icons/Sync';
@@ -73,6 +74,13 @@ function a11yProps(index) {
 
 
 const useStyles = makeStyles((theme) => ({
+
+  progress: {
+     marginLeft:300,
+     marginTop:300,
+  }
+    ,
+
   root: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
@@ -134,8 +142,8 @@ export default function Analytics() {
   const timeseriesData = useSelector(state => state.timeseriesData)
   const timestamp = useSelector(state => state.timestamp);
 
-  const currAgent = useSelector(state => state.myagent);
-
+  // const currAgent = useSelector(state => state.myagent);
+  const [currAgent,setCurrentAgent] = useState(null);
 
   // console.log("tHIS IS AGENT DETAILS", instanceArray);
   // console.log("timestamp", timestamp);
@@ -169,23 +177,26 @@ export default function Analytics() {
     setCurrTime(Date.now());
     check = false;
     dispatch(resetTimeSeries());
-    // handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc")
 
   }
 
  function handleAgentClicked(agentId){
 
-    dispatch(saveAgent(agentId));
-    if(currAgent !=null)
-      {
-        handleVisualise();
-        autoDataFetch();
-      }
+    // dispatch(saveAgent(agentId));
+    setCurrentAgent(agentId , handleVisualise() );
+
+    // if(currAgent !=null)
+    //   {
+    //     handleVisualise();
+    //     autoDataFetch();
+    //   }
 
   }
 
-  function handleVisualise() {
-
+  function handleVisualise(agentId) {
+    
+     setCurrentAgent(agentId);
+    if(currAgent != null){
 
      console.log(currAgent)
     const times = graphInit==false?3600000:MINUTE_MS;
@@ -265,6 +276,9 @@ export default function Analytics() {
 
         setCurrTime(currTime + MINUTE_MS);
     console.log('graph is set',graphInit);
+
+      }
+
   }
 
   function xAxisChanger(data, newData) {
@@ -296,33 +310,46 @@ export default function Analytics() {
   }, [])
 
   useEffect(() => {
-    
-    handleVisualise();
+    if(currAgent != null){
+    handleVisualise(currAgent);
+    }
   }, [granularity])
 
-  // useEffect(() => {
-
-  //   const interval = setInterval(() => {
-  //     handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
-  //   }, 60000);
-
-  //   return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   
+  useEffect(() => {
+    if(currAgent != null){
+    handleVisualise(currAgent);
+    }
+  }, [currAgent])
+
   
-  // }, [currTime])
 
-  function autoDataFetch(){
+  useEffect(() => {
 
-    alert("auto data fetch started");
+    if(currAgent != null){
     const interval = setInterval(() => {
-      handleVisualise();
+      
+      handleVisualise(currAgent);
     }, 60000);
 
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   
+   }
+  
+  }, [currTime])
+
+  // function autoDataFetch(){
+
+  //   alert("auto data fetch started");
+  //   const interval = setInterval(() => {
+  //     handleVisualise();
+  //   }, 60000);
+
+  //   return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  
 
 
-  }
+  // }
 
 
   // console.log("timeseries data", timeseriesData);
@@ -484,7 +511,7 @@ export default function Analytics() {
  
 
                   {
-                    
+                    Object.entries(timeseriesData).length > 0 ?
                     Object.entries(timeseriesData).map(function([key , value]) {
                       console.log(key, value);
                       return (
@@ -497,6 +524,10 @@ export default function Analytics() {
                         </Grid>
                       );
                      })
+                     :
+                     <CircularProgress  className={ classes.progress}/>
+
+
                   }
 
                   
