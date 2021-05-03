@@ -39,7 +39,7 @@ export const sendNotifyMail = (
         template: 'email',
         context: {
             message: message,
-            name: 'nginx notification',
+            name: agentId,
         }, // send extra values to template
     };
     transporter.sendMail(mail_options, (err, _data) => {
