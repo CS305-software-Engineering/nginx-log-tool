@@ -5,7 +5,7 @@ import {SAVE_AGENT} from '../constants';
 
 
               
-export default function agentReducer(state = '', action) {
+export default function agentReducer(state = null, action) {
     // console.log('state: ', state);
     // console.log('actiondata: ', action.data)
     switch (action.type) {

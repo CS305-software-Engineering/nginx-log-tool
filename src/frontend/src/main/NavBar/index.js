@@ -1,4 +1,4 @@
-import React from 'react';
+import {React,useEffect ,useState} from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -13,11 +13,13 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import ForgotPassword from '../Login/updatePassword';
 import { Link , useHistory} from 'react-router-dom';
-import { logOut } from '../../service/actions/user.actions';
+import { logOut, saveNotification } from '../../service/actions/user.actions';
 import {useDispatch} from 'react-redux';
 import axios from 'axios';
 import NotificationButton from './notification';
 import Button from '@material-ui/core/Button';
+import axiosInstance from '../../axios';
+
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -86,8 +88,8 @@ const useStyles = makeStyles((theme) => ({
 export default function PrimarySearchAppBar() {
   const history =useHistory();
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -99,6 +101,26 @@ export default function PrimarySearchAppBar() {
   const handleMobileMenuClose = () => {
     setMobileMoreAnchorEl(null);
   };
+
+
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+   
+      axiosInstance.get('notify/all')
+      .then(function (response) {
+        console.log("Notification",JSON.stringify(response.data));
+        dispatch(saveNotification(response.data.notifications));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+
+    }, 60000);
+
+    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  }, [])
+
 
   const handleMenuClose = () => {
     setAnchorEl(null);

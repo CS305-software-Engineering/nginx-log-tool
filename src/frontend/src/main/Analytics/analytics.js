@@ -176,15 +176,22 @@ export default function Analytics() {
  function handleAgentClicked(agentId){
 
     dispatch(saveAgent(agentId));
+    if(currAgent !=null)
+      {
+        handleVisualise();
+        autoDataFetch();
+      }
+
   }
 
-  function handleVisualise(agentId) {
+  function handleVisualise() {
 
 
      console.log(currAgent)
     const times = graphInit==false?3600000:MINUTE_MS;
     // const a = graphInit == false?10000:0;
     // console.log("ljhldsjahfhadh", currTime);
+
     const ngmetrics = [
       "getMethods",
       "headMethods",
@@ -229,7 +236,7 @@ export default function Analytics() {
           "to": currTime,
           "metric": ngmetrics[i],
           "granularity": granularity,
-          "agentId": agentId,
+          "agentId": currAgent,
           "aggr_fn": "sum"
         }
       );
@@ -288,10 +295,10 @@ export default function Analytics() {
     getInstanceObjects();
   }, [])
 
-  // useEffect(() => {
+  useEffect(() => {
     
-  //   handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
-  // }, [granularity])
+    handleVisualise();
+  }, [granularity])
 
   // useEffect(() => {
 
@@ -300,7 +307,22 @@ export default function Analytics() {
   //   }, 60000);
 
   //   return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  
+  
   // }, [currTime])
+
+  function autoDataFetch(){
+
+    alert("auto data fetch started");
+    const interval = setInterval(() => {
+      handleVisualise();
+    }, 60000);
+
+    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  
+
+
+  }
 
 
   // console.log("timeseries data", timeseriesData);
@@ -373,7 +395,7 @@ export default function Analytics() {
 
               {instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
                 return (
-                  <ListItem button id={value.agentId} onClick={() => handleVisualise(value.agentId)} >
+                  <ListItem button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
                     <ListItemAvatar>
                       <Avatar>
                         <FolderIcon />
