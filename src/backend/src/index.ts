@@ -15,6 +15,7 @@ import timeseries from './routes/ui/timeseries';
 import user from './routes/ui/user';
 import alerts from './routes/ui/alerts';
 import notify from './routes/ui/notify';
+import path from 'path';
 
 dotenv.config();
 const app = express();
@@ -26,6 +27,8 @@ app.use(
         credentials: true,
     })
 );
+
+app.use(express.static(path.join(__dirname, 'build')));
 
 // express middlewares
 
@@ -63,12 +66,15 @@ app.use('/aapi/agent/static', staticMetrics);
 app.use('/aapi/agent/dyn', dynMetrics);
 
 // 404-page not found
-app.use((_req: Request, res: Response, _next: any) => {
-    res.status(404).send("Sorry can't find that");
+app.get('/wapi/*', (_req, res) => {
+    res.status(404).send("Can't find that for webapp");
+});
+app.get('/aapi/*', (_req, res) => {
+    res.status(404).send("Can't find that for agent");
 });
 
-app.get('/', (_req: Request, res: Response) => {
-    res.send({ error: false });
+app.get('*', (_req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, 'build/index.html'));
 });
 
 app.listen(process.env.PORT ?? 3000, () => {

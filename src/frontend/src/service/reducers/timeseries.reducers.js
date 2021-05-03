@@ -19,6 +19,13 @@ export default function timeseriesReducer(state = data, action) {
                     tempState[key] = value;
               
                 }
+
+                let l = tempState[key].length;
+                if(tempState[key].length > 70)
+                {
+                    tempState[key].slice(l-65);
+                }
+
             });
             return tempState;
         

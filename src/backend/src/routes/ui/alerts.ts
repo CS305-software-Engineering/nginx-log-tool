@@ -66,12 +66,13 @@ app.post(
                     newAlert.save(async (err: any) => {
                         if (err) {
                             throw new Error(err.message);
+                        } else {
+                            user.alerts?.push(newAlert._id);
+                            await user.save();
+                            res.status(201).send({
+                                message: 'Successfully added new alert',
+                            });
                         }
-                        user.alerts?.push(newAlert._id);
-                        await user.save();
-                        res.status(201).send({
-                            message: 'Successfully added new alert',
-                        });
                     });
                 }
             }
@@ -147,11 +148,16 @@ app.get(
     async (req: Request, res: Response) => {
         try {
             if (!req.query.id) {
-                const alerts = await Alert.find({});
-                res.send({ alerts: alerts });
+                const alerts = await User.findOne({
+                    email: res.locals.payload.email,
+                }).populate('alerts');
+                res.send({ alerts: alerts?.alerts });
             } else {
-                const alerts = await Alert.findOne({ _id: req.query.id });
-                res.send({ alerts: alerts });
+                const alerts = await User.findOne({
+                    email: res.locals.payload.email,
+                    'alerts._id': req.query.id,
+                }).populate('alerts');
+                res.send({ alerts: alerts?.alerts });
             }
         } catch (err) {
             res.status(500).send({ error: true, message: err.message });

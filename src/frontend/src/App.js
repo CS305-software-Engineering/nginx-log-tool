@@ -8,7 +8,7 @@ import { useHistory } from "react-router-dom";
 
 import {useSelector , useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { authCheck, saveTimeStamp } from './service/actions/user.actions';
+import { addInstance , authCheck, saveNotification, saveTimeStamp } from './service/actions/user.actions';
 
 
 
@@ -22,6 +22,11 @@ function App() {
     dispatch(saveTimeStamp(Math.floor(Date.now())));
   }, [])
  
+
+
+
+
+
 
   console.log(user)
   return (

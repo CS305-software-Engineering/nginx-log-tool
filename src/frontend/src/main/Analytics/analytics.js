@@ -7,6 +7,7 @@ import axiosInstance from '../../axios';
 import { useEffect } from 'react';
 import NavBar from '../NavBar';
 import { Divider, Button, Container, Grid, Paper, IconButton } from '@material-ui/core';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import LineChart from '../Components/Charts/Line';
 import SyncIcon from '@material-ui/icons/Sync';
@@ -24,7 +25,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { addInstance, resetTimeSeries, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
+import { addInstance, resetTimeSeries, saveAgent, saveGraphInit, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
 
 import AddInstanceDialog from './createInstanceDialog';
 import AppBar from '@material-ui/core/AppBar';
@@ -35,7 +36,6 @@ import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
 
-// sample agent id 5505d27ea1c7f1509736b60f3d081923b12eedfc
 
 
 function TabPanel(props) {
@@ -73,6 +73,13 @@ function a11yProps(index) {
 
 
 const useStyles = makeStyles((theme) => ({
+
+  progress: {
+     marginLeft:600,
+     marginTop:300,
+  }
+    ,
+
   root: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
@@ -130,51 +137,63 @@ export default function Analytics() {
   const [granularity , setGran] = useState("1m");
   const classes = useStyles();
   const dispatch = useDispatch();
-  const [currAgent, setCurrentAgent] = useState(null);
   const instanceArray = useSelector(state => state.instanceData)
   const timeseriesData = useSelector(state => state.timeseriesData)
-  const timestamp = useSelector(state => state.timestamp);
+  const currTime = useSelector(state => state.timestamp);
+  const currAgent = useSelector(state => state.myagent);
+  // const [currAgent,setCurrentAgent] = useState(null);
+  const [graphData, setGraphData] = React.useState([]);
+
   // console.log("tHIS IS AGENT DETAILS", instanceArray);
   // console.log("timestamp", timestamp);
-  const [value, setValue] = React.useState(0);
-  const [graphInit, setGraphInit] = React.useState(false);
-  const [graphData, setGraphData] = React.useState([]);
-  const [currTime,setCurrTime]=React.useState(Date.now());
-  const [startDate , setStartDate] = useState('');
-  const [endDate , setEndDate] = useState('');
+  // const [graphInit, setGraphInit] = React.useState(false);
 
-  const startDateHandler=(e) =>{
-    setStartDate(e.target.value) ;
-  }
-  const endDateHandler=(e) =>{
-    setEndDate(e.target.value) ;
-  }
-
-
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const graphInit = useSelector(state=> state.graphInit);
+  // const [currTime,setCurrTime]=React.useState(Date.now());
 
   function handleGran(a , b){
     setGran(a);
     MINUTE_MS = b;
     // setGraphInit(false);
-    setCurrTime(Date.now());
+    dispatch(saveGraphInit(false));
+    // setCurrTime(Date.now());
+    dispatch(saveTimeStamp(Date.now()))
     check = false;
     dispatch(resetTimeSeries());
-    // handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc")
 
   }
 
-  function handleVisualise(agentId) {
+ function handleAgentClicked(agentId){
 
-    //  console.log(agentId)
-    //  setCurrentAgent(agentId);
-    const times = check==false?3600000:MINUTE_MS;
+    dispatch(saveAgent(agentId));
+    // setCurrentAgent(agentId  );
+    // setGraphInit(false);
+    dispatch(saveGraphInit(false));
+
+
+    dispatch(resetTimeSeries());
+
+
+    // if(currAgent !=null)
+    //   {
+    //     handleVisualise();
+    //     autoDataFetch();
+    //   }
+
+  }
+
+  function handleVisualise(currAgent) {
+    
+    // setCurrentAgent(agentId);
+    if(currAgent != null){
+
+     console.log(currAgent)
+    const times = graphInit==false?3600000:MINUTE_MS;
     // const a = graphInit == false?10000:0;
     // console.log("ljhldsjahfhadh", currTime);
+
     const ngmetrics = [
+      "cpuPercent",
       "getMethods",
       "headMethods",
       "postMethods",
@@ -218,7 +237,7 @@ export default function Analytics() {
           "to": currTime,
           "metric": ngmetrics[i],
           "granularity": granularity,
-          "agentId": agentId,
+          "agentId": currAgent,
           "aggr_fn": "sum"
         }
       );
@@ -227,6 +246,7 @@ export default function Analytics() {
     const data  ={
       "metrics":x
     }
+    console.log(data)
     axiosInstance.post(`timeseries/seq`, data)
         .then(function (response) {
           // console.log("ojhjodahvhfsabxxxxxxxxxx",response.data);
@@ -241,18 +261,19 @@ export default function Analytics() {
         .catch(function (error) {
           console.log(error);
         });
-        setGraphInit(true);
+        // setGraphInit(true);
+        dispatch(saveGraphInit(true));
+
         check = true;
 
-        setCurrTime(currTime + MINUTE_MS);
+        // setCurrTime(currTime + MINUTE_MS);
+        dispatch(saveTimeStamp(currTime + MINUTE_MS));
     console.log('graph is set',graphInit);
+
+      }
+
   }
 
-  function xAxisChanger(data, newData) {
-    data.shift();
-    data.push(newData);
-    return data;
-  }
 
 
   function getInstanceObjects() {
@@ -262,6 +283,7 @@ export default function Analytics() {
       .then(function (response) {
         // console.log(JSON.stringify(response.data));
         dispatch(addInstance(response));
+        // setCurrentAgent(response.)
 
       })
       .catch(function (error) {
@@ -276,16 +298,32 @@ export default function Analytics() {
   }, [])
 
   useEffect(() => {
-    handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
+    if(currAgent != null){
+    handleVisualise(currAgent);
+    }
   }, [granularity])
+
+  
+  useEffect(() => {
+    if(currAgent != null){
+    handleVisualise(currAgent);
+    }
+  }, [currAgent])
+
+  
 
   useEffect(() => {
 
+    if(currAgent != null){
     const interval = setInterval(() => {
-      handleVisualise("5505d27ea1c7f1509736b60f3d081923b12eedfc");
+      
+      handleVisualise(currAgent);
     }, 60000);
 
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  
+   }
+  
   }, [currTime])
 
 
@@ -327,20 +365,8 @@ export default function Analytics() {
       <div className={classes.root}>
         <Grid container >
 
-          <Grid item xs={2} >
-            <div className={classes.search}>
-              <div className={classes.searchIcon}>
-                <SearchIcon />
-              </div>
-              <InputBase
-                placeholder="Search…"
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }}
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </div>
+          <Grid item xs={3} >
+
 
             <Grid>
               <Grid item>
@@ -359,7 +385,8 @@ export default function Analytics() {
 
               {instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
                 return (
-                  <ListItem button id={value.agentId} onClick={() => handleVisualise(value.agentId)} >
+                  <div>
+                  <ListItem style={{backgroundColor: value.agentId == currAgent? "green" : "orange"}} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
                     <ListItemAvatar>
                       <Avatar>
                         <FolderIcon />
@@ -368,27 +395,24 @@ export default function Analytics() {
                     <ListItemText
                       primary={`${value.description.host} ${value.description.uid} `}
                     />
-                    <ListItemSecondaryAction>
 
-                      {/* <IconButton edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton> */}
-                    </ListItemSecondaryAction>
                   </ListItem>
+                  <Divider />
+                  </div>
                 );
               })
-                : null}
+                : <p>No agents present</p>}
             </List>
           </Grid>
           <Grid item  >
             <Divider orientation="vertical" ></Divider>
           </Grid>
 
-          <Grid item xs={9} >
+          <Grid item xs={8} >
 
             <Container >
               <br></br>
-              <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
+              {/* <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
                 <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
                   <Tab label="Nginx Metrics" {...a11yProps(1)} />
                   <Tab label="System Metrics" {...a11yProps(0)} />
@@ -398,59 +422,15 @@ export default function Analytics() {
               <TabPanel value={value} index={1}>
                 <h1 className='title' style={{ textAlign: "center" }}>System Metrics</h1>
 
-              </TabPanel>
-              <TabPanel value={value} index={0}>
-                <h1 className='title' style={{ textAlign: "center" }}>NGINX Metrics</h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
-
-                  <div>
-
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                  
-                    id="startDate"
-                    label="Start Date"
-                    type="date"
-                    fullWidth
-                    variant="outlined"      
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange ={startDateHandler}
-                  />
-
-            <TextField
-                    autoFocus
-                    margin="dense"
-                  
-                    id="endDate"
-                    label="End Date"
-                    type="date"
-                    fullWidth
-                    variant="outlined"      
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    onChange ={endDateHandler}
-
-                  />
-                  </div>
                 <Grid container spacing={1}>
 
             
  
 
                   {
-                    
+                    Object.entries(timeseriesData).length > 0 ?
                     Object.entries(timeseriesData).map(function([key , value]) {
-                      console.log(key, value);
+                      // console.log(key, value);
                       return (
                         <Grid item lg={6} md={6} xs={12}>
   
@@ -461,12 +441,54 @@ export default function Analytics() {
                         </Grid>
                       );
                      })
+                     :
+                     <CircularProgress  className={ classes.progress}/>
+
+
+                  }
+                  </Grid>
+
+              </TabPanel> */}
+
+              {/* <TabPanel value={value} index={0}> */}
+                <h1 className='title' style={{ textAlign: "center" }}>OS and NGINX Metrics </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+
+                <Grid container spacing={1}>
+
+            
+ 
+
+                  {
+                    Object.entries(timeseriesData).length > 0 ?
+                    Object.entries(timeseriesData).map(function([key , value]) {
+                      // console.log(key, value);
+                      return (
+                        <Grid item lg={6} md={6} xs={12}>
+  
+                          <Paper elevation={2}>
+              
+                            <LineChart data={key} x={getX(value)} y={getY(value)} />
+                          </Paper>
+                        </Grid>
+                      );
+                     })
+                     :
+                     <CircularProgress  className={ classes.progress}/>
+
+
                   }
 
                   
 
                 </Grid>
-              </TabPanel>
+              {/* </TabPanel> */}
 
             </Container>
 

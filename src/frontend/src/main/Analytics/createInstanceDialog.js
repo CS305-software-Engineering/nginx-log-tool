@@ -36,9 +36,10 @@ export default function AlertDialogSlide() {
 
   return (
     <div>
-      <Button variant="outlined" color="secondary" style={{width:"100%"}} onClick={handleClickOpen}>
-        Add Instance/Agent
-      </Button>
+      <br></br>
+      <Button variant="outlined" color="secondary" style={{width:"100%"}} onClick={handleClickOpen}>  
+        Register New Agent  
+        </Button>
       <Dialog
         open={open}
         TransitionComponent={Transition}

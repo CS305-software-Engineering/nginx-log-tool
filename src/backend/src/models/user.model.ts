@@ -13,7 +13,7 @@ export interface IUser extends Document {
     max_alerts?: Number;
     agents?: Array<String> | Array<IAgent>;
     alerts?: Array<String> | Array<IAlert>;
-    notifics?: Array<String> | Array<INotify>;
+    notifications?: Array<String> | Array<INotify>;
 }
 
 export enum e_timewindow {
@@ -32,9 +32,9 @@ export const userSchema: Schema = new Schema({
     max_agents: { type: Number, default: 5 },
     max_alerts: { type: Number, default: 5 },
     timewindow: { type: String, enum: e_timewindow, default: e_timewindow.h_1 },
-    agents: [{ type: Schema.Types.ObjectId, ref: 'Agents' }],
+    agents: [{ type: Schema.Types.ObjectId, ref: 'agents' }],
     alerts: [{ type: Schema.Types.ObjectId, ref: 'alerts' }],
-    notifics: [{ type: Schema.Types.ObjectId, ref: 'notifications' }],
+    notifications: [{ type: Schema.Types.ObjectId, ref: 'notifications' }],
 });
 
-export default mongoose.model<IUser>('Users', userSchema);
+export default mongoose.model<IUser>('users', userSchema, 'users');

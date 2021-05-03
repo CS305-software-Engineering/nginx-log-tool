@@ -10,19 +10,22 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { Icon, IconButton , MenuItem} from '@material-ui/core';
 
 
+
+
 import Checkbox from '@material-ui/core/Checkbox';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import axiosInstance from '../../axios';
 
 
-export default function SetAlertForm() {
+export default function SetAlertForm(props) {
   const [open, setOpen] = React.useState(false);
   const [checkedstate ,setState] = React.useState(false);
-  const [metric , setMetric] = React.useState("");
-  const [threshold , setThresh] = React.useState(0);
+  const [metric , setMetric] = React.useState(props.metric);
+  const [threshold , setThresh] = React.useState(props.th);
 
-  const [comp , setComp] = React.useState("");
-  const [email , setEmail] = useState("");
-  const [time , setTime] = useState('');
+  const [comp , setComp] = React.useState(props.operator);
+  const [email , setEmail] = useState(props.contact);
+  const [time , setTime] = useState(props.period);
 
 
   const ngmetrics = [
@@ -91,16 +94,54 @@ export default function SetAlertForm() {
 }  
 
   const handleAddAlert = () => {
+    const data ={
+      "metric_name":metric,
+      "contact":email,
+      "operator":comp,
+      "period":time,
+      "threshold":threshold,
+      "agentId":props.agentId
 
+    }
+    console.log(data)
+    axiosInstance.post(`alerts/add`, data)
+    .then(function (response) {
+      console.log(response.data);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 
   };
+
+
+  function handleEdit(){
+
+    const data ={
+      "metric_name":metric,
+      "contact":email,
+      "operator":comp,
+      "period":time,
+      "threshold":threshold,
+      "agentId":props.agentId
+
+    }
+
+
+    axiosInstance.put(`alerts/update/${props._id}` , data).then(function(response){
+            console.log(response)       
+    })
+    .catch(function (error) {
+        console.log(error);
+      });   
+}
 
   return (
     <div>
         
       <Button onClick={handleClickOpen} aria-label="display more actions" edge="end" variant="outlined" color="primary">
-        ADD ALERT
-     </Button>
+       {props.f == 0 ? "ADD ALERT" : "EDIT" } 
+      </Button>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Set Alert Parameters</DialogTitle>
         <DialogContent >
@@ -139,11 +180,9 @@ export default function SetAlertForm() {
                     value={comp}
                   >
                 
-                      <MenuItem value="greater" > Greater Than </MenuItem>
-                      <MenuItem value="less" > Less Than </MenuItem>
-                      <MenuItem value="equal" > Equal To </MenuItem>
-
-                 
+                      <MenuItem value="<" > {`<`} </MenuItem>
+                      <MenuItem value=">" > {`>`}</MenuItem> 
+                      <MenuItem value="=" > = </MenuItem>        
                   
          </TextField>
          <TextField
@@ -173,11 +212,14 @@ export default function SetAlertForm() {
 
                   >
                 
+                      <MenuItem value="2m" > 2m </MenuItem>
                       <MenuItem value="5m" > 5m </MenuItem>
+                      <MenuItem value="10m" > 10m </MenuItem>
                       <MenuItem value="30m" > 30m </MenuItem>
-                      <MenuItem value="1h" > 1h</MenuItem>
+                      <MenuItem value="1hr" > 1hr</MenuItem>
 
-                      <MenuItem value="4h" > 4h</MenuItem>
+                      <MenuItem value="4hr" > 4hr</MenuItem>
+                      <MenuItem value="24hr" > 24hr</MenuItem>
 
                   
          </TextField>
@@ -196,16 +238,17 @@ export default function SetAlertForm() {
 
           />
 
-
-
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleAddAlert} color="primary">
-            Set Alert
-          </Button>
+          {
+            props.f == 0? <Button onClick={handleAddAlert} color="primary"> Set Alert </Button> :
+                     <Button onClick={handleEdit} variant="outlined" style={{color:"orange"}}>Edit</Button> 
+
+          }
+          
         </DialogActions>
       </Dialog>
     </div>

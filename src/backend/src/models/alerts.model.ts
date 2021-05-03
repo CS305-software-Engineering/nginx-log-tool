@@ -20,7 +20,6 @@ export const threshOp: { [id: string]: string } = {
 export interface IAlert extends Document {
     user: String;
     metric_name: String;
-    source: String;
     contact: String;
     operator?: String;
     threshold?: Number;
@@ -34,7 +33,6 @@ export interface IAlert extends Document {
 const alertSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'Users' },
     metric_name: { type: String, required: true },
-    source: { type: String, required: true },
     contact: { type: String, required: true },
     operator: String,
     threshold: String,
@@ -45,4 +43,4 @@ const alertSchema = new Schema({
     date_created: { type: Number, default: Date.now(), required: true },
 });
 
-export default mongoose.model<IAlert>('alerts', alertSchema);
+export default mongoose.model<IAlert>('alerts', alertSchema, 'alerts');
