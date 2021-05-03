@@ -71,4 +71,28 @@ app.delete(
     }
 );
 
+// /**
+//  * @route           POST /notify/remove_all
+//  * @description     delete a notification from the backend.
+//  * @access          Private
+//  */
+// app.delete(
+//     '/remove_all',
+//     verifyToken(e_actor.user),
+//     async (req: Request, res: Response) => {
+//         try {
+//             const user = await User.findOne({
+//                 email: res.locals.payload.email,
+//             });
+//             const notific_ids = user?.notifications;
+//             await user?.updateOne(
+//                 { email: res.locals.payload.email },
+//                 { $set: { notifications: [] } }
+//             );
+//         } catch (err) {
+//             res.status(500).send({ error: true, message: err.message });
+//         }
+//     }
+// );
+
 export default app;

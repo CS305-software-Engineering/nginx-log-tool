@@ -19,7 +19,7 @@ export interface agentTokenPayload {
 
 export function genAccessToken(
     payload: userTokenPayload | agentTokenPayload,
-    expiry: string = '1h'
+    expiry: string = '2 days'
 ) {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET! as jwt.Secret, {
         expiresIn: expiry,
