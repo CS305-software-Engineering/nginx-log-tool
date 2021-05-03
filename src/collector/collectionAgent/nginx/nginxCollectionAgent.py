@@ -46,7 +46,7 @@ class nginxCollectionAgent:
             'idleConnections': 0, 
             'requestCount': 0, 
             'currentRequest': 0, 
-            'readingRequests': 0, 
+      t      'readingRequests': 0, 
             'writingRequests':0, 
             
         }
@@ -185,7 +185,6 @@ class nginxCollectionAgent:
             
         for key in setup:
             self.data[key]=setup[key]
-
             
     # def setWorkers(self):
     #     store=open(self.meta['storePath'], 'rb') #reading the previous persistently stored variable.  
@@ -278,7 +277,8 @@ class nginxCollectionAgent:
         pickle.dump(self.data,store) # storing the latest data in the store. 
         store.close()
         return self.data
-        
+
+
 agent=nginxCollectionAgent()
 # print(agent.setWorkers())
 
