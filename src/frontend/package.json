@@ -1,5 +1,4 @@
 {
-  "homepage": "https://cs305-software-engineering.github.io/nginx-log-tool",
   "name": "logger",
   "version": "0.1.0",
   "private": true,

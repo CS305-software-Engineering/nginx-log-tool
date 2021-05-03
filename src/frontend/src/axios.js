@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-const baseURL = 'http://nginx-log-tool.herokuapp.com/wapi/';
+const baseURL = 'https://nginx-log-tool.herokuapp.com/wapi/';
 // const baseURL ='https://software-engineering-308707.el.r.appspot.com/wapi/';
+// const baseURL ='http://localhost:8001/wapi/'
 
 
 const  axiosInstance = axios.create({
