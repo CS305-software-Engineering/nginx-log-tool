@@ -219,9 +219,9 @@ class nginxCollectionAgent:
             except psutil.ZombieProcess:
                 self.zombies.append(p.pid)
 
-        self.data['memory.rss']=rss
-        self.data['memory.vms']=vms
-        self.data['memory.rss_pct']=pct
+        self.data['memoryRss']=rss
+        self.data['memoryVms']=vms
+        self.data['memoryRss_pct']=pct
         self.data['workersCount']=len(processes)
 
         """nginx.workers.fds_count"""
@@ -233,13 +233,13 @@ class nginxCollectionAgent:
                 fds += p.num_fds()
             except psutil.ZombieProcess:
                 self.handle_zombie(p.pid)
-        self.data['workers.fds_count']=fds
+        self.data['workersFdsCount']=fds
 
         """
-        io
+        io description
 
-        nginx.workers.io.kbs_r
-        nginx.workers.io.kbs_w
+        io.kbs_r
+        io.kbs_w
         """
         # collect raw data
         read, write = 0, 0
@@ -264,7 +264,7 @@ class nginxCollectionAgent:
             value_delta = value - cumMetrics[metric_name]
             self.cum[metric_name]=value
             self.data[metric_name]= value_delta
-
+    
     def setData(self):
         handles=[]
         for i in self.collectorFunctions:
