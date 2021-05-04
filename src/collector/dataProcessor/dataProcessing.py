@@ -73,7 +73,7 @@ class dataProcessor():
                 cnt += 1
         # API call
         try:
-            print(data)
+            # print(data)
             response = requests.post('https://software-engineering-308707.el.r.appspot.com/aapi/agent/dyn', json={'data':data}, headers={
                 'Authorization': 'Bearer '+os.environ.get("TOKEN")
             }) # this is  the posting api call to the backend. 
@@ -87,7 +87,7 @@ class dataProcessor():
 
 def main():
     if os.geteuid() != 0:
-        os.execvp('sudo', ['sudo', '/opt/venvs/collector/bin/activate/python'] + sys.argv)
+        os.execvp('sudo', ['sudo', '/opt/venvs/collector/bin/python'] + sys.argv)
     else:
         processor = dataProcessor()
         # Initial run

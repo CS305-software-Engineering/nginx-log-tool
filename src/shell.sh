@@ -9,6 +9,3 @@ python setup.py
 cd ..
 cd dataProcessor
 cd $currpath
-sudo cp -f $currpath/nginxCollector.service /lib/systemd/system/nginxCollector.service
-sudo systemctl daemon-reload
-sudo systemctl enable nginxCollector.service
