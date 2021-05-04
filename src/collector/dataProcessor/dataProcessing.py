@@ -14,7 +14,7 @@ from utility.logger import logger
 load_dotenv(verbose=True)
 env_path = Path('../') / '.env'
 load_dotenv(dotenv_path=env_path)
-
+import random
 def threaded(fn):
     def wrapper(*args, **kwargs):
         thread = threading.Thread(target=fn, args=args, kwargs=kwargs)
@@ -22,6 +22,65 @@ def threaded(fn):
         return thread
     return wrapper
 
+def testData():
+    nginxmetrics=["httpStatus1xx",
+    "httpStatus2xx",
+    "httpStatus3xx",
+    "httpStatus4xx",
+    "httpStatus5xx",
+    "httpStatus403",
+    "httpStatus404",
+    "httpStatus500,",
+    "httpStatus502",
+    "httpStatus503",
+    "httpStatus504",
+    "protocolHttp_v1_0",
+    "protocolHttp_v0_9",
+    "protocolHttp_v1_1",
+    "protocolHttp_v2",
+    "getMethods",
+    "headMethods",
+    "postMethods",
+    "putMethods",
+    "deleteMethods",
+    "optionsMethods",
+    "connectionAccepted",
+    "connectionsDropped",
+    "activeConnections",
+    "currentConnections",
+    "memoryRss",
+    "memoryVms",
+    "memoryRss_pct",
+    "workersCount",
+    "workersFdsCount",
+    "IoKiloBytesRead",
+    "IoKiloBytesWrite"]
+    osmetrics=[
+   "userCPU",
+   "systemCPU",
+   "idleCPU",
+    "rss",
+    "vms"
+    "virtualMemoryTotal",
+    "virtualMemoryUsed",
+    "virtualMemoryAll",
+    "virtualMemoryCached",
+    "virtualMemoryBuffers",
+    "virtualMemoryFree",
+    "virtualMemoryPercent",
+    "virtualMemoryAvailable",
+    "totalSwapMemory",
+    "usedSwapMemory",
+    "freeSwapMemory",
+    "percentFreeSwapMemory"];
+    nginx={}
+    os={}
+    for metric in nginxmetrics: 
+        nginx[metric]=random.randint(0,50)
+    for metric in nginxmetrics: 
+        os[metric]=random.randint(0,50)
+    
+    return nginx, os
 
 class dataProcessor():
     """Constructor"""
@@ -32,12 +91,8 @@ class dataProcessor():
         self.getDataFinished = True
 
     def addData(self): # this is the function which is adding the data to the persist queue. 
-        nginxStatus=os.popen('systemctl is-active nginx').read()
-        temp1={}
-        temp2={}
-        if(nginxStatus.strip()=="active"):
-            temp1=self.nginxCollector.setData()
-        temp2=self.systemCollector.setData()
+        # nginxStatus=os.popen('systemctl is-active nginx').read()
+        temp1, temp2=testData()
         for i in temp1:
             temp1[i]={
                 'value':temp1[i]
@@ -86,9 +141,6 @@ class dataProcessor():
         self.getDataFinished = True
 
 def main():
-    if os.geteuid() != 0:
-        os.execvp('sudo', ['sudo', '/opt/venvs/collector/bin/activate/python'] + sys.argv)
-    else:
         processor = dataProcessor()
         # Initial run
         while(1):
