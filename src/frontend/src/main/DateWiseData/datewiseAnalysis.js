@@ -27,7 +27,6 @@ import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { addInstance, resetTimeSeries, saveAgent, saveGraphInit, saveNginxMetrics, saveOsMetrics, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
 
-import AddInstanceDialog from './createInstanceDialog';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -130,66 +129,41 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function Analytics() {
-  var MINUTE_MS = 60000;
-  var check = false;
-  // const [MINUTE_MS ,setMinute] = useState(60000);
+export default function DateAnalytics() {
+  
+  const dispatch= useDispatch();
   const [granularity , setGran] = useState("1m");
   const classes = useStyles();
-  const dispatch = useDispatch();
   const instanceArray = useSelector(state => state.instanceData)
-  const timeseriesData = useSelector(state => state.timeseriesData)
-  const currTime = useSelector(state => state.timestamp);
-  const currAgent = useSelector(state => state.myagent);
-  // const [currAgent,setCurrentAgent] = useState(null);
-  const [graphData, setGraphData] = React.useState([]);
-  const nginx = useSelector(state=>state.nginxMetric);
-  const os = useSelector(state=>state.osMetric);
-
+  const [timeseriesData,setTimeSeriesData]  = useState({});
+  const [currAgent,setCurrentAgent] = useState(null);
   const [value , setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
- console.log(os);
- console.log(nginx);
-
-  const graphInit = useSelector(state=> state.graphInit);
-  // const [currTime,setCurrTime]=React.useState(Date.now());
 
   function handleGran(a , b){
     setGran(a);
-    MINUTE_MS = b;
-    // setGraphInit(false);
-    dispatch(saveGraphInit(false));
-    // setCurrTime(Date.now());
-    dispatch(saveTimeStamp(Date.now()))
-    check = false;
-    dispatch(resetTimeSeries());
-
   }
 
  function handleAgentClicked(agentId){
 
-    dispatch(saveAgent(agentId));
-    dispatch(saveGraphInit(false));
-    dispatch(resetTimeSeries());
+    setCurrentAgent(agentId);
+
   }
 
   function handleVisualise(currAgent) {
     
     if(currAgent != null){
-
-    console.log(currAgent)
-    const times = graphInit==false?3600000:MINUTE_MS;
   
     const x = []
     for (var i=0; i < ngmetrics.length; i++) {
       x.push(
         {
-          "from": currTime - times,
-          "to": currTime,
+          "from": startTime,
+          "to": endTime,
           "metric": ngmetrics[i],
           "granularity": granularity,
           "agentId": currAgent,
@@ -197,33 +171,18 @@ export default function Analytics() {
         }
       );
     }
-    // console.log('x value',x);
     const data  ={
       "metrics":x
     }
     console.log(data)
     axiosInstance.post(`timeseries/seq`, data)
         .then(function (response) {
-          // console.log("ojhjodahvhfsabxxxxxxxxxx",response.data);
-          // if(graphInit == true){
-          //   dispatch(updateTimeSeriesData(response));
-
-          // }else{
-            dispatch(saveTimeSeriesData(response));
-          // }
-          setGraphData(response.data);
+            setTimeSeriesData(response);
+        
         })
         .catch(function (error) {
           console.log(error);
         });
-        // setGraphInit(true);
-        dispatch(saveGraphInit(true));
-
-        check = true;
-
-        // setCurrTime(currTime + MINUTE_MS);
-        dispatch(saveTimeStamp(currTime + MINUTE_MS));
-    console.log('graph is set',graphInit);
 
       }
 
@@ -238,33 +197,18 @@ export default function Analytics() {
       .then(function (response) {
         // console.log(JSON.stringify(response.data));
         dispatch(addInstance(response));
-        // setCurrentAgent(response.)
 
       })
       .catch(function (error) {
         console.log(error);
       });
 
-    // setInterval(100000);
   }
 
-  function fetchMetrics() {
-    if(currAgent != null){
-      // alert(currAgent);
-    axiosInstance.get(`metrics/${currAgent}?static=0&dyn=1`).then(function(response){
-      console.log("kijkphfgiahira",response.data)
-      dispatch(saveOsMetrics(response.data.metrics.os));
-      dispatch(saveNginxMetrics(response.data.metrics.nginx));
 
-    }).catch(function(error){
-      console.log(error)
-    });
-  }
-}
 
   useEffect(() => {
     getInstanceObjects();
-    // fetchMetrics()
   }, [])
 
   useEffect(() => {
@@ -277,27 +221,10 @@ export default function Analytics() {
   useEffect(() => {
     if(currAgent != null){
     handleVisualise(currAgent);
-    // fetchMetrics()
-
     }
   }, [currAgent])
 
   
-
-  useEffect(() => {
-
-    if(currAgent != null){
-    const interval = setInterval(() => {
-      
-      handleVisualise(currAgent);
-    }, 60000);
-
-    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  
-   }
-  
-  }, [currTime])
-
 
   // console.log("timeseries data", timeseriesData);
 
@@ -314,7 +241,6 @@ export default function Analytics() {
 
             <Grid>
               <Grid item>
-                <AddInstanceDialog />
                 <IconButton onClick={getInstanceObjects}>
                   <SyncIcon />
 
