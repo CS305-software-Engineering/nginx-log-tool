@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import requests
 import persistqueue
 from utility.logger import logger
-
+import json
 load_dotenv(verbose=True)
 env_path = Path('../') / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -72,22 +72,30 @@ class dataProcessor():
                 data.append(queue.get())
                 cnt += 1
         # API call
+        sent=False
         try:
-            print(data)
+            
             response = requests.post('https://software-engineering-308707.el.r.appspot.com/aapi/agent/dyn', json={'data':data}, headers={
                 'Authorization': 'Bearer '+os.environ.get("TOKEN")
             }) # this is  the posting api call to the backend. 
-            logger.log("Successfully sent the data")
+            response=json.loads(response.text)
+            if(response['error']=="False"):
+                logger.log("Successfully sent the data" + response['error'])
+                sent=True
+            else: 
+                logger.log(response["message"])
 
         except:
             logger.log("There was an api error, request failed")
+
+        if(sent==False):
             for i in data:
-                queue.put(i)
+                queue.put(i)   
         self.getDataFinished = True
 
 def main():
     if os.geteuid() != 0:
-        os.execvp('sudo', ['sudo', '/opt/venvs/collector/bin/activate/python'] + sys.argv)
+        os.execvp('sudo', ['sudo', '/home/taneesh/6thSem(9.5)/Software Engineering/venv/bin/python3.8'] + sys.argv)
     else:
         processor = dataProcessor()
         # Initial run
