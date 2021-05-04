@@ -218,6 +218,9 @@ export default function PrimarySearchAppBar() {
           <Button component={Link} to='/analytics' color="inherit" style={{marginLeft:20 }} variant="outlined">
           Analytics
           </Button>
+          <Button component={Link} to='/analysis-date' color="inherit" style={{marginLeft:20 }} variant="outlined">
+          Datewise Analysis
+          </Button>
            <Button component={Link} to='/alerts' color="inherit" style={{marginLeft:20 }} variant="outlined">
           Alerts
           </Button>

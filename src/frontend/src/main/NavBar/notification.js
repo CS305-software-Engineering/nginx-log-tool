@@ -89,6 +89,8 @@ export default function NotificationButton() {
    then(function(response){
      console.log(response);
      alert(response.data.message);
+     handleClose();
+
    })
    .catch(function (error) {
     console.log(error);

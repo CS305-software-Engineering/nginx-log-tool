@@ -5,7 +5,7 @@ import Analytics from './main/Analytics/analytics';
 // import Overview from './main/Overview/overview';
 import Alerts from './main/Alerts/alert';
 import { useHistory } from "react-router-dom";
-
+import DateAnalytics from './main/DateWiseData/datewiseAnalysis';
 import {useSelector , useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { addInstance , authCheck, saveNotification, saveTimeStamp } from './service/actions/user.actions';
@@ -36,7 +36,19 @@ function App() {
           <Route path="/register">
             <Register />
           </Route>
+          
  
+          <Route path="/analysis-date">
+          {
+              !user.isAuthenticated ?   
+                <Login />
+              :
+              <DateAnalytics />
+            }
+          
+          </Route>
+
+
           <Route path="/analytics">
           {
               !user.isAuthenticated ?   
