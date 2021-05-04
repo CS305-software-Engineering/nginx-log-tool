@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import requests
 import persistqueue
 from utility.logger import logger
-
+import json
 load_dotenv(verbose=True)
 env_path = Path('../') / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -127,17 +127,27 @@ class dataProcessor():
                 data.append(queue.get())
                 cnt += 1
         # API call
+        sent=False
         try:
-            print(data)
-            response = requests.post('https://software-engineering-308707.el.r.appspot.com/aapi/agent/dyn', json={'data':data}, headers={
+            response = requests.post('https://nginx-log-tool.herokuapp.com/aapi/agent/dyn/', json={'data':data}, headers={
                 'Authorization': 'Bearer '+os.environ.get("TOKEN")
             }) # this is  the posting api call to the backend. 
-            logger.log("Successfully sent the data")
+            
+            response=json.loads(response.text)
+            
+            if(response['error']=="False"):
+                logger.log("Successfully sent the data")
+                sent=True
+            else: 
+                logger.log(response["message"])
 
         except:
-            logger.log("There was an api error, request failed")
+            logger.log("api failed")
+
+        if(sent==False): 
             for i in data:
                 queue.put(i)
+                
         self.getDataFinished = True
 
 def main():
