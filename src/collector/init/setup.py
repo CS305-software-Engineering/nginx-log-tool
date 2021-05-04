@@ -74,7 +74,7 @@ def setupAgent():
             "uid":ip
         }
     }
-    response = requests.post('https://software-engineering-308707.el.r.appspot.com/aapi/agent/init', json=data)
+    response = requests.post('https://nginx-log-tool.herokuapp.com/aapi/agent/init/', json=data)
     try: 
         storeEnv('TOKEN',json.loads(response.text)['token'])
         return 1

@@ -35,8 +35,8 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
-
-
+import TabComponent from './TabComponent';
+import {ngmetrics,httpStatus,httpProtocols,httpMethods,httpConnections,workers,CPUInfo,AgentInfo,VirtualMemory ,SwapMemory } from '../../service/constants';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -173,69 +173,17 @@ export default function Analytics() {
  function handleAgentClicked(agentId){
 
     dispatch(saveAgent(agentId));
-    // setCurrentAgent(agentId  );
-    // setGraphInit(false);
     dispatch(saveGraphInit(false));
-
-
     dispatch(resetTimeSeries());
-
-
-    // if(currAgent !=null)
-    //   {
-    //     handleVisualise();
-    //     autoDataFetch();
-    //   }
-
   }
 
   function handleVisualise(currAgent) {
     
-    // setCurrentAgent(agentId);
     if(currAgent != null){
 
-     console.log(currAgent)
+    console.log(currAgent)
     const times = graphInit==false?3600000:MINUTE_MS;
-    // const a = graphInit == false?10000:0;
-    // console.log("ljhldsjahfhadh", currTime);
-
-   const ngmetrics = [
-      "cpuPercent",
-      "getMethods",
-      "headMethods",
-      "postMethods",
-      "putMethods",
-      "deleteMethods",
-      "optionsMethods",
-      "httpStatus1xx",
-      "httpStatus2xx",
-      "httpStatus3xx",
-      "httpStatus4xx",
-      "httpStatus5xx",
-      "httpStatus403",
-      "httpStatus404",
-      "httpStatus500,",
-      "httpStatus502",
-      "httpStatus503",
-      "httpStatus504",
-      "httpStatusDiscarded",
-      "protocolHttp_v1_0",
-      "protocolHttp_v0_9",
-      "protocolHttp_v1_1",
-      "protocolHttp_v2",
-      "connectionAccepted",
-      "connectionsDropped",
-      "activeConnections",
-      "currentConnections",
-      "idleConnections",
-      "requestCount",
-      "currentRequest",
-      "readingRequests",
-      "writingRequests"
-  ];
-    // var data = {
-    //   "metrics": []
-    // };
+  
     const x = []
     for (var i=0; i < ngmetrics.length; i++) {
       x.push(
@@ -329,7 +277,7 @@ export default function Analytics() {
   useEffect(() => {
     if(currAgent != null){
     handleVisualise(currAgent);
-    fetchMetrics()
+    // fetchMetrics()
 
     }
   }, [currAgent])
@@ -353,32 +301,6 @@ export default function Analytics() {
 
   // console.log("timeseries data", timeseriesData);
 
-  function getX(l) {
-
-    var list_ = []
-    for(var i =0 ;i< l.length ; i++)
-    {
-
-     var date = new Date(l[i]._id);
-      var hours = date.getHours();
-      var minutes = date.getMinutes();
-      list_.push(`${hours}:${minutes}`);
-    }
-    
-    return list_;
-
-  }
-
-  function getY(l) {
-
-    var list_ = []
-    for(var i =0 ;i< l.length ; i++)
-    {
-
-      list_.push(l[i].value);
-    }
-    return list_;
-  }
 
   return (
     <div>
@@ -405,13 +327,14 @@ export default function Analytics() {
               {instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
                 return (
                   <div>
-                  <Button style={{backgroundColor: value.agentId == currAgent? '#ABEBC6' : '#D7BDE2' }} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
+                  <Button style={{width:"100%", backgroundColor: value.agentId == currAgent? '#ABEBC6' : '#D7BDE2' }} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
                     <ListItemAvatar>
                       <Avatar>
                         <FolderIcon />
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
+                     
                       primary={`${value.description.host}-${value.description.uid}`}
                     />
 
@@ -432,14 +355,21 @@ export default function Analytics() {
             <Container >
               <br></br>
               <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
-                <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-                  <Tab label="Nginx Metrics" {...a11yProps(1)} />
-                  <Tab label="System Metrics" {...a11yProps(0)} />
+                <Tabs variant="scrollable"  value={value} onChange={handleChange} aria-label="simple tabs example">
+                  <Tab label="Http Methods" {...a11yProps(0)} /> 
+                  <Tab label="Http Status" {...a11yProps(1)} />
+                  <Tab label="Http Protocols" {...a11yProps(2)} />
+                  <Tab label= "Http Connections" {...a11yProps(3)} />
+                  <Tab label="Workers" {...a11yProps(4)} />
+                  <Tab label="CPU Info"  {...a11yProps(5)} />
+                  <Tab label="Agent Info"  {...a11yProps(6)} />
+                  <Tab label="Virtual Memory" {...a11yProps(7)} />
+                  <Tab label="Swap Memory" {...a11yProps(8)} />
 
                 </Tabs>
               </AppBar>
-              <TabPanel value={value} index={1}>
-                <h1 className='title' style={{ textAlign: "center" }}>System Metrics</h1>
+              <TabPanel value={value} index={0}>
+                <h1 className='title' style={{ textAlign: "center" }}>HttpMethods Metrics</h1>
 
                 <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
                         <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
@@ -449,33 +379,11 @@ export default function Analytics() {
                         <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
                   </ButtonGroup>
 
-                <Grid container spacing={1}>
-                  {
-                    Object.entries(timeseriesData).length > 0  ?
-                    Object.entries(timeseriesData).map(function([key , value]) {
-                      // console.log(key, value);
-                      if(os.length>0 && os.includes(key)){
-
-                      return (
-                        <Grid item lg={6} md={6} xs={12}>
-  
-                          <Paper elevation={2}>
-              
-                            <LineChart data={key} x={getX(value)} y={getY(value)} />
-                          </Paper>
-                        </Grid>
-                      );
-                     }})
-                     :(currAgent!=null?<CircularProgress  className={ classes.progress}/>:(currAgent!=null?<CircularProgress  className={ classes.progress}/>:null))
-
-
-                  }
-                  </Grid>
-
+                  <TabComponent metrictype={httpMethods} timeseriesData ={timeseriesData}/>
               </TabPanel>
 
-              <TabPanel value={value} index={0}>
-                <h1 className='title' style={{ textAlign: "center" }}>NGINX Metrics </h1>
+              <TabPanel value={value} index={1}>
+                <h1 className='title' style={{ textAlign: "center" }}>HTTP status Metrics </h1>
                 <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
                         <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
                         <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
@@ -483,27 +391,101 @@ export default function Analytics() {
                         <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
                         <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
                   </ButtonGroup>
+                  <TabComponent metrictype={httpStatus} timeseriesData ={timeseriesData}/>
 
-                <Grid container spacing={1}>
-                  {
-                    Object.entries(timeseriesData).length > 0 ?
-                    Object.entries(timeseriesData).map(function([key , value]) {
-                      // console.log(key, value);
-                     if(nginx.length>0 && nginx.includes(key)){
-                      return (
-                        <Grid item lg={6} md={6} xs={12}>
-  
-                          <Paper elevation={2}>
-              
-                            <LineChart data={key} x={getX(value)} y={getY(value)} />
-                          </Paper>
-                        </Grid>
-                      );
-                     }})
-                     :
-                     (currAgent!=null?<CircularProgress  className={ classes.progress}/>:null)
-                  }
-                </Grid>
+               
+              </TabPanel>
+
+              <TabPanel value={value} index={2}>
+                <h1 className='title' style={{ textAlign: "center" }}>HttpProtocols Metrics </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+                  <TabComponent metrictype={httpProtocols} timeseriesData ={timeseriesData}/>
+
+               
+              </TabPanel>
+              <TabPanel value={value} index={3}>
+                <h1 className='title' style={{ textAlign: "center" }}>HttpConnections Metrics </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+                  <TabComponent metrictype={httpConnections} timeseriesData ={timeseriesData}/>
+
+               
+              </TabPanel>
+              <TabPanel value={value} index={4}>
+                <h1 className='title' style={{ textAlign: "center" }}>Workers </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+                  <TabComponent metrictype={workers} timeseriesData ={timeseriesData}/>
+
+               
+              </TabPanel>
+              <TabPanel value={value} index={5}>
+                <h1 className='title' style={{ textAlign: "center" }}> CPU Info </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+                  <TabComponent metrictype={CPUInfo} timeseriesData ={timeseriesData}/>
+
+               
+              </TabPanel>
+              <TabPanel value={value} index={6}>
+                <h1 className='title' style={{ textAlign: "center" }}>Agent Info </h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+                  <TabComponent metrictype={AgentInfo} timeseriesData ={timeseriesData}/>
+
+               
+              </TabPanel>
+              <TabPanel value={value} index={7}>
+                <h1 className='title' style={{ textAlign: "center" }}>Virtual Memory Info</h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+                  <TabComponent metrictype={VirtualMemory} timeseriesData ={timeseriesData}/>
+
+               
+              </TabPanel>
+              <TabPanel value={value} index={8}>
+                <h1 className='title' style={{ textAlign: "center" }}>Swap Memory</h1>
+                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
+                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
+                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
+                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
+                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
+                  </ButtonGroup>
+                  <TabComponent metrictype={SwapMemory} timeseriesData ={timeseriesData}/>
+
+               
               </TabPanel>
 
             </Container>
