@@ -138,7 +138,8 @@ export default function DateAnalytics() {
   const [timeseriesData,setTimeSeriesData]  = useState({});
   const [currAgent,setCurrentAgent] = useState(null);
   const [value , setValue] = useState(0);
-
+  const [startTime , setStartTime] = useState(null);
+  const [endTime , setEndTime] = useState(null);
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
