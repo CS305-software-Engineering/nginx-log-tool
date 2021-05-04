@@ -54,15 +54,15 @@ export default function TabComponent(props)
       {
         Object.entries(props.timeseriesData).length > 0 ?
         Object.entries(props.timeseriesData).map(function([key , value]) {
-          // console.log(key, value);
-          if(props.metrictype.length>0 && props.metrictype.includes(key)){
+          console.log(key, value);
+          if(props.metrictype.length>0 && props.metrictype.includes(value.metric)){
 
           return (
             <Grid item lg={6} md={6} xs={12}>
 
               <Paper elevation={2}>
   
-                <LineChart data={key} x={getX(value)} y={getY(value)} />
+                <LineChart data={value.metric} x={getX(value.timeseries)} y={getY(value.timeseries)} />
               </Paper>
             </Grid>
           );

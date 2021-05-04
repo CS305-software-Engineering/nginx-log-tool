@@ -14,18 +14,10 @@ import SyncIcon from '@material-ui/icons/Sync';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import Avatar from '@material-ui/core/Avatar';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
-import FolderIcon from '@material-ui/icons/Folder';
-import DeleteIcon from '@material-ui/icons/Delete';
+
 import { addInstance, resetTimeSeries, saveAgent, saveGraphInit, saveNginxMetrics, saveOsMetrics, saveTimeSeriesData, saveTimeStamp , updateTimeSeriesData } from '../../service/actions/user.actions';
+
+import MenuItem from '@material-ui/core/MenuItem';
 
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -132,32 +124,35 @@ const useStyles = makeStyles((theme) => ({
 export default function DateAnalytics() {
   
   const dispatch= useDispatch();
-  const [granularity , setGran] = useState("1m");
+  const [granularity , setGran] = useState("30m");
   const classes = useStyles();
   const instanceArray = useSelector(state => state.instanceData)
-  const [timeseriesData,setTimeSeriesData]  = useState({});
-  const [currAgent,setCurrentAgent] = useState(null);
+  const [timeseriesData,setTimeSeriesData]  = useState([]);
+  const [myAgent,setMyAgent] = useState(null);
   const [value , setValue] = useState(0);
-  const [startTime , setStartTime] = useState(null);
-  const [endTime , setEndTime] = useState(null);
+  const [startTime , setStartTime] = useState('');
+  const [endTime , setEndTime] = useState('');
+
+  function agentNameChange(e){
+      setMyAgent(e.target.value)
+  }
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-
-  function handleGran(a , b){
-    setGran(a);
+  const handleStartChange=(e)=>{
+      setStartTime(new Date(e.target.value).getTime());
+  }
+  const handleEndChange=(e)=>{
+      setEndTime(new Date(e.target.value).getTime());
   }
 
- function handleAgentClicked(agentId){
+ 
 
-    setCurrentAgent(agentId);
-
-  }
-
-  function handleVisualise(currAgent) {
+  function handleVisualise() {
     
-    if(currAgent != null){
+    if(myAgent != null && startTime!= null && endTime!=null){
   
     const x = []
     for (var i=0; i < ngmetrics.length; i++) {
@@ -167,7 +162,7 @@ export default function DateAnalytics() {
           "to": endTime,
           "metric": ngmetrics[i],
           "granularity": granularity,
-          "agentId": currAgent,
+          "agentId": myAgent,
           "aggr_fn": "sum"
         }
       );
@@ -175,10 +170,10 @@ export default function DateAnalytics() {
     const data  ={
       "metrics":x
     }
-    console.log(data)
     axiosInstance.post(`timeseries/seq`, data)
         .then(function (response) {
-            setTimeSeriesData(response);
+            console.log(response.data)
+            setTimeSeriesData(response.data.result);
         
         })
         .catch(function (error) {
@@ -191,43 +186,27 @@ export default function DateAnalytics() {
 
 
 
-  function getInstanceObjects() {
+//   function getInstanceObjects() {
 
 
-    axiosInstance.get(`system/objects`)
-      .then(function (response) {
-        // console.log(JSON.stringify(response.data));
-        dispatch(addInstance(response));
+//     axiosInstance.get(`system/objects`)
+//       .then(function (response) {
+//         // console.log(JSON.stringify(response.data));
+//         dispatch(addInstance(response));
 
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+//       })
+//       .catch(function (error) {
+//         console.log(error);
+//       });
 
-  }
+//   }
 
 
 
-  useEffect(() => {
-    getInstanceObjects();
-  }, [])
-
-  useEffect(() => {
-    if(currAgent != null){
-    handleVisualise(currAgent);
-    }
-  }, [granularity])
-
-  
-  useEffect(() => {
-    if(currAgent != null){
-    handleVisualise(currAgent);
-    }
-  }, [currAgent])
-
-  
-
-  // console.log("timeseries data", timeseriesData);
+//   useEffect(() => {
+//     getInstanceObjects();
+//   }, [])
+//   console.log("date wise data", timeseriesData);
 
 
   return (
@@ -237,50 +216,64 @@ export default function DateAnalytics() {
       <div className={classes.root}>
         <Grid container >
 
-          <Grid item xs={3} >
+          <Grid item xs={12} >
+          <Container>
+          <h1 className='title' style={{ textAlign: "center" }}> Choose Date Range </h1>
+          
+          <TextField
+                autoFocus
+                margin="dense"
+                style={{marginLeft:100}}
+                id="startDate"
+                label="Start Date"
+                type="date"
+                
+                variant="outlined"      
+                InputLabelProps={{
+                shrink: true,
+                }}
+                onChange={handleStartChange}
+               
+            />
+            
+        
+            <TextField
+                autoFocus
+                margin="dense"
+                style={{marginLeft:100}}
 
+                id="endDate"
+                label="End Date"
+                type="date"
+                
+                variant="outlined"      
+                InputLabelProps={{
+                shrink: true,
+                }}
+                onChange={handleEndChange}
+            />
+             <TextField
+                    id="agent"
+                    select
+                    label="Please select Agent"
+                    fullWidth
+                    variant="outlined"
 
-            <Grid>
-              <Grid item>
-                <IconButton onClick={getInstanceObjects}>
-                  <SyncIcon />
-
-                </IconButton>
-              </Grid>
-
-
-            </Grid>
-
-
-            <List >
-
-              {instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
-                return (
-                  <div>
-                  <ListItem style={{backgroundColor: value.agentId == currAgent? "green" : "orange"}} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
-                    <ListItemAvatar>
-                      <Avatar>
-                        <FolderIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={`${value.description.host}-${value.description.uid}`}
-                    />
-
-                  </ListItem>
-                  <Divider />
-                  </div>
-                );
-              })
-                : <p>No agents present</p>}
-            </List>
-          </Grid>
-          <Grid item  >
-            <Divider orientation="vertical" ></Divider>
-          </Grid>
-
-          <Grid item xs={8} >
-
+                    onChange={agentNameChange}
+                    value={myAgent}
+                    style = {{marginTop:10}}
+                  >
+                  {instanceArray.instanceData==undefined?<em>none</em>:
+                    instanceArray.instanceData.map((value) => (
+                      <MenuItem value={value.agentId} >
+                      <em>{`${value.description.host}-${value.description.uid}`}</em>
+                      </MenuItem>
+                    ))
+                  }
+                </TextField>
+            
+                <Button onClick={handleVisualise()}>Go</Button>
+            </Container>
             <Container >
               <br></br>
               <AppBar style={{ backgroundColor: "whitesmoke", color: "black" }} position="static">
@@ -300,26 +293,13 @@ export default function DateAnalytics() {
               <TabPanel value={value} index={0}>
                 <h1 className='title' style={{ textAlign: "center" }}>HttpMethods Metrics</h1>
 
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
 
                   <TabComponent metrictype={httpMethods} timeseriesData ={timeseriesData}/>
               </TabPanel>
 
               <TabPanel value={value} index={1}>
                 <h1 className='title' style={{ textAlign: "center" }}>HTTP status Metrics </h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+               
                   <TabComponent metrictype={httpStatus} timeseriesData ={timeseriesData}/>
 
                
@@ -327,91 +307,49 @@ export default function DateAnalytics() {
 
               <TabPanel value={value} index={2}>
                 <h1 className='title' style={{ textAlign: "center" }}>HttpProtocols Metrics </h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+               
                   <TabComponent metrictype={httpProtocols} timeseriesData ={timeseriesData}/>
 
                
               </TabPanel>
               <TabPanel value={value} index={3}>
                 <h1 className='title' style={{ textAlign: "center" }}>HttpConnections Metrics </h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+               
                   <TabComponent metrictype={httpConnections} timeseriesData ={timeseriesData}/>
 
                
               </TabPanel>
               <TabPanel value={value} index={4}>
                 <h1 className='title' style={{ textAlign: "center" }}>Workers </h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+                
                   <TabComponent metrictype={workers} timeseriesData ={timeseriesData}/>
 
                
               </TabPanel>
               <TabPanel value={value} index={5}>
                 <h1 className='title' style={{ textAlign: "center" }}> CPU Info </h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+                
                   <TabComponent metrictype={CPUInfo} timeseriesData ={timeseriesData}/>
 
                
               </TabPanel>
               <TabPanel value={value} index={6}>
                 <h1 className='title' style={{ textAlign: "center" }}>Agent Info </h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+                
                   <TabComponent metrictype={AgentInfo} timeseriesData ={timeseriesData}/>
 
                
               </TabPanel>
               <TabPanel value={value} index={7}>
                 <h1 className='title' style={{ textAlign: "center" }}>Virtual Memory Info</h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+                
                   <TabComponent metrictype={VirtualMemory} timeseriesData ={timeseriesData}/>
 
                
               </TabPanel>
               <TabPanel value={value} index={8}>
                 <h1 className='title' style={{ textAlign: "center" }}>Swap Memory</h1>
-                <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-                        <Button onClick = {() =>handleGran("1m" , 60000)}>1m</Button>
-                        <Button  onClick = {() =>handleGran("5m" , 300000)}>5m</Button>
-                        <Button  onClick = {() =>handleGran("30m" ,1800000)}> 30m</Button>
-                        <Button onClick = {() =>handleGran("1h" , 86400000)}>1h</Button>
-                        <Button onClick = {() =>handleGran("4h" , 345600000)}>4h</Button>
-                  </ButtonGroup>
+                
                   <TabComponent metrictype={SwapMemory} timeseriesData ={timeseriesData}/>
 
                

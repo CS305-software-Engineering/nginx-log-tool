@@ -7,7 +7,7 @@ const baseURL ='https://software-engineering-308707.el.r.appspot.com/wapi/';
 
 const  axiosInstance = axios.create({
 	baseURL: baseURL,
-	timeout: 20000,
+	timeout: 200000,
 	headers: {
 		Authorization: localStorage.getItem('access_token')
 			? 'Bearer ' + localStorage.getItem('access_token')

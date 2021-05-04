@@ -40,6 +40,7 @@ export const ngmetrics = [
     "currentConnections",
     "memoryRss",
     "memoryVms",
+    "memoryRss_pct",
     "workersCount",
     "workersFdsCount",
     "IoKiloBytesRead",
@@ -102,6 +103,7 @@ export const  httpConnections=[
 export const workers = [
     "memoryRss",
     "memoryVms",
+    "memoryRss_pct",
     "workersCount",
     "workersFdsCount",
     "IoKiloBytesRead",
