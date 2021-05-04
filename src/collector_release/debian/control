@@ -1,0 +1,13 @@
+Source: collector
+Section: python
+Priority: extra
+Maintainer: IIT Ropar <iit@example.com>
+Build-Depends: debhelper (>= 9), python3, dh-virtualenv (>= 0.8)
+Standards-Version: 3.9.5
+
+Package: collector
+Architecture: any
+Pre-Depends: dpkg (>= 1.16.1), python3.8, ${misc:Pre-Depends}
+Depends: ${misc:Depends}
+Description: A collection agent for collection of nginx server logs. 
+

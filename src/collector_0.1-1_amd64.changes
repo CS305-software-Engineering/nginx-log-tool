@@ -1,0 +1,28 @@
+Format: 1.8
+Date: Fri, 03 May 2021 17:00:00 +0200
+Source: collector
+Binary: collector
+Architecture: amd64
+Version: 0.1-1
+Distribution: unstable
+Urgency: low
+Maintainer: IIT Ropar <iit@example.com>
+Changed-By: IIT Ropar <iit@example.com>
+Description:
+ collector  - A collection agent for collection of nginx server logs.
+Changes:
+ collector (0.1-1) unstable; urgency=low
+ .
+   * Initial public release
+Checksums-Sha1:
+ 094bf3aff5f36dfd38f4dc4474d036b6a4db349d 68084 collector-dbgsym_0.1-1_amd64.ddeb
+ 14e696ccf769f9b8586e21489741fa325cb61156 6766 collector_0.1-1_amd64.buildinfo
+ 10845a0a0d4722bc4d8416e71e327e020dba0a9b 2473468 collector_0.1-1_amd64.deb
+Checksums-Sha256:
+ 13c6419267046e73e6e4bf540af2a5415911935a60e762ba689c4f96db7cc99e 68084 collector-dbgsym_0.1-1_amd64.ddeb
+ 92b2ace05998be96c3aa2936cc5734a3d97a7c29d91af58618770e0ef0fedf8d 6766 collector_0.1-1_amd64.buildinfo
+ 9fe469b2114a269a0a794a1ec36b2ac59f49990d280a24ae0b6c3c1c65482099 2473468 collector_0.1-1_amd64.deb
+Files:
+ 211c6ffe7aeb13f6069129d6db4cd8bf 68084 debug optional collector-dbgsym_0.1-1_amd64.ddeb
+ 1a2961a2d5fa5a905361c5f98a209a75 6766 python extra collector_0.1-1_amd64.buildinfo
+ b6bc337883d105f5ccf8008d10b463a6 2473468 python extra collector_0.1-1_amd64.deb

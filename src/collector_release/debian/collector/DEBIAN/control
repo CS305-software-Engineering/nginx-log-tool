@@ -1,0 +1,9 @@
+Package: collector
+Version: 0.1-1
+Architecture: amd64
+Maintainer: IIT Ropar <iit@example.com>
+Installed-Size: 13408
+Pre-Depends: dpkg (>= 1.16.1), python3.8
+Section: python
+Priority: extra
+Description: A collection agent for collection of nginx server logs.
