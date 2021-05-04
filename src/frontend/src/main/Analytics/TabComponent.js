@@ -3,7 +3,7 @@ import {Grid , Paper , CircularProgress} from '@material-ui/core';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
 import LineChart from '../Components/Charts/Line';
-
+import { useDispatch, useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
 
@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
 export default function TabComponent(props)
 {
     const classes = useStyles();
+    const currAgent = useSelector(state => state.myagent);
 
 
   function getX(l) {
@@ -68,8 +69,7 @@ export default function TabComponent(props)
           );
          }})
          :
-         <CircularProgress  className={ classes.progress}/>
-
+         (currAgent!=null?<CircularProgress  className={ classes.progress}/>:null)
 
       }
       </Grid>

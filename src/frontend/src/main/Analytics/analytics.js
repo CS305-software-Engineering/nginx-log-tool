@@ -263,7 +263,9 @@ export default function Analytics() {
 }
 
   useEffect(() => {
+    if(instanceArray.length<=0){
     getInstanceObjects();
+    }
     // fetchMetrics()
   }, [])
 
@@ -327,13 +329,14 @@ export default function Analytics() {
               {instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
                 return (
                   <div>
-                  <Button style={{backgroundColor: value.agentId == currAgent? '#ABEBC6' : '#D7BDE2' }} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
+                  <Button style={{width:"100%", backgroundColor: value.agentId == currAgent? '#ABEBC6' : '#D7BDE2' }} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
                     <ListItemAvatar>
                       <Avatar>
                         <FolderIcon />
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
+                     
                       primary={`${value.description.host}-${value.description.uid}`}
                     />
 
