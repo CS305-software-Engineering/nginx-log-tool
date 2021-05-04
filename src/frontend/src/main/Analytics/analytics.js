@@ -377,9 +377,7 @@ export default function Analytics() {
 
       list_.push(l[i].value);
     }
-  
     return list_;
-
   }
 
   return (
@@ -389,15 +387,12 @@ export default function Analytics() {
       <div className={classes.root}>
         <Grid container >
 
-          <Grid item xs={3} >
-
-
+          <Grid item xs={2} >
             <Grid>
               <Grid item>
-                <AddInstanceDialog />
+                <AddInstanceDialog/>
                 <IconButton onClick={getInstanceObjects}>
                   <SyncIcon />
-
                 </IconButton>
               </Grid>
 
@@ -410,7 +405,7 @@ export default function Analytics() {
               {instanceArray.instanceData != undefined ? instanceArray.instanceData.map((value) => {
                 return (
                   <div>
-                  <ListItem style={{backgroundColor: value.agentId == currAgent? "green" : "orange"}} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
+                  <Button style={{backgroundColor: value.agentId == currAgent? '#ABEBC6' : '#D7BDE2' }} button id={value.agentId} onClick={() => handleAgentClicked(value.agentId)} >
                     <ListItemAvatar>
                       <Avatar>
                         <FolderIcon />
@@ -420,7 +415,7 @@ export default function Analytics() {
                       primary={`${value.description.host}-${value.description.uid}`}
                     />
 
-                  </ListItem>
+                  </Button>
                   <Divider />
                   </div>
                 );
@@ -455,12 +450,8 @@ export default function Analytics() {
                   </ButtonGroup>
 
                 <Grid container spacing={1}>
-
-            
- 
-
                   {
-                    Object.entries(timeseriesData).length > 0 ?
+                    Object.entries(timeseriesData).length > 0  ?
                     Object.entries(timeseriesData).map(function([key , value]) {
                       // console.log(key, value);
                       if(os.length>0 && os.includes(key)){
@@ -475,8 +466,7 @@ export default function Analytics() {
                         </Grid>
                       );
                      }})
-                     :
-                     <CircularProgress  className={ classes.progress}/>
+                     :(currAgent!=null?<CircularProgress  className={ classes.progress}/>:(currAgent!=null?<CircularProgress  className={ classes.progress}/>:null))
 
 
                   }
@@ -495,10 +485,6 @@ export default function Analytics() {
                   </ButtonGroup>
 
                 <Grid container spacing={1}>
-
-            
- 
-
                   {
                     Object.entries(timeseriesData).length > 0 ?
                     Object.entries(timeseriesData).map(function([key , value]) {
@@ -515,20 +501,33 @@ export default function Analytics() {
                       );
                      }})
                      :
-                     <CircularProgress  className={ classes.progress}/>
-
-
+                     (currAgent!=null?<CircularProgress  className={ classes.progress}/>:null)
                   }
-
-                  
-
                 </Grid>
               </TabPanel>
 
             </Container>
-
-
+                  
           </Grid>
+        <Grid>
+        <ButtonGroup
+        orientation="vertical"
+        color="primary"
+        aria-label="vertical contained primary button group"
+        variant="text"
+        >
+       {/* <Typography font={20}>Select the category you want to see</Typography> */}
+        <Button onClick={()=>{setValue(0)}}>httpConnections</Button>
+        <Button onClick={()=>{setValue(1)}}>httpStatus</Button>
+        <Button onClick={()=>{setValue(2)}}>httpProtocols</Button>
+        <Button onClick={()=>{setValue(3)}}>httpMethods</Button>
+        <Button onClick={()=>{setValue(4)}}>Workers</Button>
+        <Button onClick={()=>{setValue(5)}}>CPUInfo</Button>
+        <Button onClick={()=>{setValue(6)}}>AgentInfo</Button>
+        <Button onClick={()=>{setValue(7)}}>Virtual Memory</Button>
+        <Button onClick={()=>{setValue(8)}}>SwapMemory</Button>
+      </ButtonGroup>
+        </Grid>
 
         </Grid>
       </div>
